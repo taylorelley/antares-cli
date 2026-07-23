@@ -96,9 +96,28 @@ npm install
 npm run compile        # bundle to dist/extension.js (esbuild)
 npm run check-types    # tsc --noEmit
 npm run test-unit      # node --test for the pure request-building logic
+npm run vsix           # produce antares-vscode-<version>.vsix
 ```
 
 Press **F5** in VS Code to launch an Extension Development Host.
+
+Install the packaged build with:
+
+```bash
+code --install-extension antares-vscode-0.1.0.vsix
+```
+
+### Git hook (auto-build the VSIX)
+
+The repository ships a pre-commit hook that rebuilds and type-checks the VSIX
+whenever extension source is staged, so a broken build can never be committed.
+Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The hook is a no-op for commits that do not touch `vscode-extension/` source.
 
 The bundled `python/antares_host.py` speaks newline-delimited JSON: a single request
 object on stdin, then `ready` / `progress` / `worker` / `finding` / `result` / `error`
