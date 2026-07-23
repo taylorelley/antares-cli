@@ -51,6 +51,7 @@ class QueryRequest:
     backend: str | None = None
     endpoint: str | None = None
     api_key: str | None = None
+    api_style: str | None = None
     terminal_call_budget: int | None = DEFAULT_TERMINAL_CALL_BUDGET
     additional_ignore_paths: list[str] = field(default_factory=list)
     allow_sensitive_files: list[str] = field(default_factory=list)
@@ -67,6 +68,7 @@ class SweepRequest:
     backend: str | None = None
     endpoint: str | None = None
     api_key: str | None = None
+    api_style: str | None = None
     scope: ScanScope = "auto"
     cwe_level: CweAbstractionLevel = "all"
     max_cwes: int = DEFAULT_AUTOMATIC_CWE_LIMIT
@@ -406,6 +408,7 @@ def _runtime_options_from_query(request: QueryRequest) -> RuntimeOptions:
         backend=request.backend,
         endpoint=request.endpoint,
         api_key=request.api_key,
+        api_style=request.api_style,
     )
 
 
@@ -417,6 +420,7 @@ def _runtime_options_from_sweep(request: SweepRequest) -> RuntimeOptions:
         backend=request.backend,
         endpoint=request.endpoint,
         api_key=request.api_key,
+        api_style=request.api_style,
     )
 
 

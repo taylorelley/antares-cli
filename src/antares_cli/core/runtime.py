@@ -35,6 +35,7 @@ class RuntimeOptions:
     backend: str | None = None
     endpoint: str | None = None
     api_key: str | None = None
+    api_style: str | None = None
 
 
 @dataclass(slots=True)
@@ -70,6 +71,7 @@ class RuntimeResolution:
     api_key: str | None
     selected_profile: InferenceProfile | None
     model_spec: ModelSpec | None
+    api_style: str | None = None
 
 
 @dataclass(slots=True, frozen=True)
@@ -148,7 +150,22 @@ def _resolve_runtime_inputs(
         api_key=api_key,
         selected_profile=selected_profile,
         model_spec=model_spec,
+        api_style=_normalize_api_style(options.api_style),
     )
+
+
+def _normalize_api_style(api_style: str | None) -> str | None:
+    """Validate the optional chat/completions API selector."""
+    if api_style is None:
+        return None
+    normalized = api_style.strip().lower()
+    if not normalized:
+        return None
+    if normalized not in {"chat", "completions"}:
+        raise RuntimeConfigurationError(
+            "api_style must be 'chat' or 'completions' when provided."
+        )
+    return normalized
 
 
 def _resolve_named_profile(profile: str) -> InferenceProfile:
@@ -185,6 +202,7 @@ def _resolve_backend(
         resolution.selected_profile,
         resolution.model_spec,
         explicit_api_key=resolution.api_key,
+        api_style=resolution.api_style,
     )
     if inference_backend is not None:
         return inference_backend
@@ -213,10 +231,11 @@ def _build_inference_backend(
     model_spec: ModelSpec | None,
     *,
     explicit_api_key: str | None,
+    api_style: str | None = None,
 ) -> InferenceBackend | None:
     backend_settings = _backend_settings(settings, selected_profile, model_spec)
     if backend_settings.backend_name in {"auto", "remote"} and settings.endpoint:
-        return _build_remote_backend(settings, backend_settings, explicit_api_key)
+        return _build_remote_backend(settings, backend_settings, explicit_api_key, api_style)
     return None
 
 
@@ -238,11 +257,16 @@ def _build_remote_backend(
     settings: AntaresSettings,
     backend_settings: BackendSettings,
     explicit_api_key: str | None,
+    api_style: str | None = None,
 ) -> RemoteInferenceBackend:
     endpoint_spec = backend_settings.endpoint_spec
     generation = backend_settings.generation
     if settings.endpoint is None:
         raise RuntimeConfigurationError("Remote inference requires a configured endpoint")
+    use_completions_api = _resolve_use_completions_api(
+        api_style,
+        default=generation.use_completions_api,
+    )
     return RemoteInferenceBackend(
         model_id=settings.model,
         endpoint=settings.endpoint,
@@ -259,8 +283,22 @@ def _build_remote_backend(
         repetition_penalty=generation.repetition_penalty,
         frequency_penalty=generation.frequency_penalty,
         stop_tokens=generation.stop_tokens,
-        use_completions_api=generation.use_completions_api,
+        use_completions_api=use_completions_api,
     )
+
+
+def _resolve_use_completions_api(api_style: str | None, *, default: bool) -> bool:
+    """Map an explicit API-style selector onto the completions/chat toggle.
+
+    ``chat`` targets ``/v1/chat/completions`` (OpenAI-compatible and Ollama servers)
+    while ``completions`` targets ``/v1/completions`` (vLLM-hosted Antares checkpoints).
+    When unset, the profile/model default is preserved.
+    """
+    if api_style == "chat":
+        return False
+    if api_style == "completions":
+        return True
+    return default
 
 
 def _endpoint_timeout(endpoint_spec: EndpointSpec | None, settings: AntaresSettings) -> float:

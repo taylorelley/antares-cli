@@ -1,0 +1,210 @@
+{
+  "name": "antares-vscode",
+  "displayName": "Antares Security Scanner",
+  "description": "Run the Antares CWE vulnerability-localization agent from VS Code against any OpenAI-compatible or Ollama endpoint.",
+  "version": "0.1.0",
+  "publisher": "antares",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "security",
+    "cwe",
+    "vulnerability",
+    "static analysis",
+    "ollama"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "antares.scanForCwe",
+        "title": "Scan Folder for CWE…",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.autoSweep",
+        "title": "Auto-Sweep Folder for Vulnerabilities",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.setApiKey",
+        "title": "Set API Key",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.clearApiKey",
+        "title": "Clear API Key",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.setupEnvironment",
+        "title": "Set Up Python Environment",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.showLastReport",
+        "title": "Show Last Report (JSON)",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.clearResults",
+        "title": "Clear Results",
+        "category": "Antares",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "antares",
+          "title": "Antares",
+          "icon": "media/antares.svg"
+        }
+      ]
+    },
+    "views": {
+      "antares": [
+        {
+          "id": "antaresResults",
+          "name": "Findings",
+          "icon": "media/antares.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "antaresResults",
+        "contents": "No Antares scan has run yet.\n[Scan Folder for CWE…](command:antares.scanForCwe)\n[Auto-Sweep Folder](command:antares.autoSweep)\nConfigure your model endpoint in [settings](command:workbench.action.openSettings?%22antares%22)."
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "antares.scanForCwe",
+          "when": "explorerResourceIsFolder",
+          "group": "antares@1"
+        },
+        {
+          "command": "antares.autoSweep",
+          "when": "explorerResourceIsFolder",
+          "group": "antares@2"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "antares.clearResults",
+          "when": "view == antaresResults",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Antares",
+      "properties": {
+        "antares.provider": {
+          "type": "string",
+          "enum": [
+            "ollama",
+            "openai-compatible",
+            "vllm",
+            "custom"
+          ],
+          "enumDescriptions": [
+            "Ollama server exposing the OpenAI-compatible API (chat completions). Defaults to http://localhost:11434/v1.",
+            "Any OpenAI-compatible server using the chat completions API.",
+            "vLLM-hosted Antares checkpoints using the raw completions API and Granite template.",
+            "Custom endpoint; use the API Style setting to choose chat or completions."
+          ],
+          "default": "ollama",
+          "markdownDescription": "Connection preset. Selects sensible defaults for the API style and endpoint. Override individual fields below as needed."
+        },
+        "antares.endpoint": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Inference endpoint base URL (e.g. `http://localhost:11434/v1`). Leave empty to use the provider default (Ollama only)."
+        },
+        "antares.model": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Served model ID. Must match the identifier exposed by your endpoint exactly (e.g. `qwen2.5-coder:7b`, `antares-1b`)."
+        },
+        "antares.apiStyle": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "chat",
+            "completions"
+          ],
+          "default": "auto",
+          "markdownDescription": "Which OpenAI-compatible API to call. `auto` derives it from the provider (chat for Ollama/OpenAI-compatible, completions for vLLM). `chat` targets `/v1/chat/completions`; `completions` targets `/v1/completions`."
+        },
+        "antares.pythonPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to a Python 3.11+ interpreter. Leave empty to auto-detect. If the interpreter already has `antares-cli` installed it is used directly; otherwise a managed virtual environment is created."
+        },
+        "antares.autoInstall": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically create a managed virtual environment and install `antares-cli` when it is not already available."
+        },
+        "antares.packageSpec": {
+          "type": "string",
+          "default": "antares-cli",
+          "markdownDescription": "pip requirement used to install Antares into the managed environment. Can be a version (`antares-cli==1.2.3`), a local path, or a wheel file."
+        },
+        "antares.toolBudget": {
+          "type": "number",
+          "default": 0,
+          "markdownDescription": "Repository tool-call budget per scan. `0` uses the Antares default."
+        },
+        "antares.sweep.workers": {
+          "type": "number",
+          "default": 4,
+          "markdownDescription": "Number of parallel CWE workers used by Auto-Sweep."
+        },
+        "antares.sweep.maxCwes": {
+          "type": "number",
+          "default": 8,
+          "markdownDescription": "Maximum number of CWE classes Auto-Sweep will select automatically."
+        },
+        "antares.diagnosticsSeverity": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warning",
+            "information",
+            "hint"
+          ],
+          "default": "warning",
+          "markdownDescription": "Severity used for findings reported in the Problems panel."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "test-unit": "node --test ./out-test/**/*.test.js",
+    "pretest-unit": "tsc -p tsconfig.test.json"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.21.5",
+    "typescript": "^5.4.5"
+  }
+}

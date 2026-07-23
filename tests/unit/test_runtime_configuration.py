@@ -199,6 +199,64 @@ def test_noncanonical_cli_model_name_uses_default_behavior_without_id_rewrite(
     assert runtime.model_spec is None
 
 
+def test_api_style_chat_selects_chat_completions_endpoint(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("ANTARES_ENDPOINT", "https://ollama.example.test/v1")
+
+    runtime = RuntimeFactory().build(
+        RuntimeOptions(target=tmp_path, model="llama3", api_style="chat")
+    )
+
+    assert isinstance(runtime.inference_backend, RemoteInferenceBackend)
+    assert runtime.inference_backend.use_completions_api is False
+
+
+def test_api_style_completions_forces_completions_endpoint(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("ANTARES_ENDPOINT", "https://inference.example.test/v1")
+
+    runtime = RuntimeFactory().build(
+        RuntimeOptions(target=tmp_path, model="antares-1b", api_style="completions")
+    )
+
+    assert isinstance(runtime.inference_backend, RemoteInferenceBackend)
+    assert runtime.inference_backend.use_completions_api is True
+
+
+def test_api_style_defaults_to_profile_behavior_when_unset(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("ANTARES_ENDPOINT", "https://inference.example.test/v1")
+
+    runtime = RuntimeFactory().build(
+        RuntimeOptions(target=tmp_path, model="antares-1b", api_style=None)
+    )
+
+    assert isinstance(runtime.inference_backend, RemoteInferenceBackend)
+    assert runtime.inference_backend.use_completions_api is True
+
+
+def test_invalid_api_style_is_rejected(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("ANTARES_ENDPOINT", "https://inference.example.test/v1")
+
+    with pytest.raises(RuntimeConfigurationError, match="api_style must be"):
+        RuntimeFactory().build(
+            RuntimeOptions(target=tmp_path, model="antares-1b", api_style="grpc")
+        )
+
+
 def test_profile_alias_uses_the_canonical_profile_resolver(
     monkeypatch,
     tmp_path: Path,
