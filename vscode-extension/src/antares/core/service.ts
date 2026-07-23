@@ -18,7 +18,29 @@ import {
   ReportSummary,
   summaryToPublicDict,
 } from "../output/finding";
+import { CweSelectionService } from "./cweSelection/engine";
+import { CweSelectionRequest, ScanScope } from "./cweSelection/models";
+import { loadSelectionTables } from "./cweSelection/tables";
+import {
+  runOrchestratedSweep,
+  SweepWorkerEvent,
+  WorkerTask,
+} from "../sweep/orchestrator";
 import { normalizeCweIds } from "./cwe";
+
+export interface SweepRequest {
+  target: string;
+  cweIds?: string[];
+  query?: string | null;
+  model?: string | null;
+  endpoint?: string | null;
+  apiStyle?: string | null;
+  apiKey?: string | null;
+  terminalCallBudget?: number | null;
+  workers?: number;
+  maxCwes?: number;
+  scope?: ScanScope;
+}
 
 export interface QueryRequest {
   target: string;
@@ -76,6 +98,68 @@ export class SecurityWorkflowService {
       query: request.query ?? null,
       target: path.basename(request.target),
       engine: "typescript",
+    };
+    return makeWorkflowResult(findings, summary, metadata);
+  }
+
+  async runCweSweep(
+    request: SweepRequest,
+    onEvent?: (event: SweepWorkerEvent) => void
+  ): Promise<WorkflowResult> {
+    const startedAt = Date.now();
+    const cweDatabase = CweDatabase.loadDefault(this.dataDir);
+    const tables = loadSelectionTables(this.dataDir);
+
+    const selectionRequest: CweSelectionRequest = {
+      target: request.target,
+      cweIds: request.cweIds ?? [],
+      ignorePaths: [],
+      allowSensitiveFiles: [],
+      scope: request.scope ?? "auto",
+      cweLevel: "all",
+      maxCwes: request.maxCwes && request.maxCwes > 0 ? request.maxCwes : 50,
+    };
+    const plan = new CweSelectionService(cweDatabase, tables).select(selectionRequest);
+    const cweIds = plan.cweIds();
+
+    const backend = buildRemoteBackend(request);
+    const adapter = resolveModelAdapter(request.model ?? "antares");
+    const tasks: WorkerTask[] = cweIds.map((cweId) => ({
+      cweId,
+      prompt: cweAnalysisPrompt([cweId], cweDatabase, request.query ?? null) ?? cweId,
+      terminalCallBudget: request.terminalCallBudget ?? null,
+    }));
+
+    const merged = await runOrchestratedSweep(tasks, {
+      target: request.target,
+      backend,
+      cweDatabase,
+      adapter,
+      workerCount: request.workers && request.workers > 0 ? request.workers : 8,
+      onEvent,
+    });
+
+    const findings = deduplicateFindings(merged.allFindings);
+    const summary = makeSummary({
+      total_findings: findings.length,
+      tool_call_count: merged.totalToolCalls,
+      duration_seconds: (Date.now() - startedAt) / 1000,
+      cwe_ids_triggered: [...new Set(findings.flatMap((f) => f.cwe_ids))].sort(),
+      failed_tool_calls: merged.workerResults.reduce((s, r) => s + r.failedToolCalls, 0),
+      retried_turns: merged.workerResults.reduce((s, r) => s + r.retriedTurns, 0),
+      generation_errors: merged.workerResults.reduce((s, r) => s + r.generationErrors, 0),
+      failed_workers: merged.failedTaskCount,
+      total_workers: merged.completedTaskCount + merged.failedTaskCount,
+    });
+    const metadata: Record<string, unknown> = {
+      mode: "cwe_sweep",
+      model: request.model ?? null,
+      backend: "remote",
+      cwe_ids: cweIds,
+      query: request.query ?? null,
+      target: path.basename(request.target),
+      engine: "typescript",
+      selection: { scope: selectionRequest.scope, selected_cwe_ids: cweIds, policy: plan.selectionPolicy },
     };
     return makeWorkflowResult(findings, summary, metadata);
   }

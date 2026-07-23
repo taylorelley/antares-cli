@@ -1,0 +1,1765 @@
+{
+ "PROFILE_SIGNAL_RULES": [
+  [
+   "authentication",
+   "auth_signals",
+   [
+    "CWE-250",
+    "CWE-269",
+    "CWE-284",
+    "CWE-285",
+    "CWE-287",
+    "CWE-306",
+    "CWE-307",
+    "CWE-384",
+    "CWE-521",
+    "CWE-640",
+    "CWE-862",
+    "CWE-863"
+   ]
+  ],
+  [
+   "data-store",
+   "data_store_signals",
+   [
+    "CWE-20",
+    "CWE-200",
+    "CWE-74",
+    "CWE-89",
+    "CWE-943"
+   ]
+  ],
+  [
+   "template-rendering",
+   "template_signals",
+   [
+    "CWE-116",
+    "CWE-20",
+    "CWE-74",
+    "CWE-79"
+   ]
+  ],
+  [
+   "file-I/O",
+   "file_io_signals",
+   [
+    "CWE-200",
+    "CWE-22",
+    "CWE-400",
+    "CWE-404",
+    "CWE-434",
+    "CWE-459",
+    "CWE-552",
+    "CWE-668",
+    "CWE-73",
+    "CWE-772"
+   ]
+  ],
+  [
+   "outbound-network",
+   "network_client_signals",
+   [
+    "CWE-200",
+    "CWE-295",
+    "CWE-319",
+    "CWE-346",
+    "CWE-400",
+    "CWE-404",
+    "CWE-770",
+    "CWE-772",
+    "CWE-918"
+   ]
+  ],
+  [
+   "deserialization",
+   "deserialization_signals",
+   [
+    "CWE-20",
+    "CWE-400",
+    "CWE-502",
+    "CWE-913"
+   ]
+  ],
+  [
+   "cryptography",
+   "crypto_signals",
+   [
+    "CWE-295",
+    "CWE-321",
+    "CWE-327",
+    "CWE-328",
+    "CWE-330",
+    "CWE-345",
+    "CWE-347"
+   ]
+  ],
+  [
+   "native-memory",
+   "native_code_signals",
+   [
+    "CWE-119",
+    "CWE-120",
+    "CWE-121",
+    "CWE-122",
+    "CWE-123",
+    "CWE-124",
+    "CWE-125",
+    "CWE-126",
+    "CWE-127",
+    "CWE-131",
+    "CWE-190",
+    "CWE-401",
+    "CWE-415",
+    "CWE-416",
+    "CWE-457",
+    "CWE-476",
+    "CWE-787"
+   ]
+  ],
+  [
+   "infrastructure-as-code",
+   "iac_signals",
+   [
+    "CWE-15",
+    "CWE-16",
+    "CWE-250",
+    "CWE-269",
+    "CWE-276",
+    "CWE-284",
+    "CWE-732",
+    "CWE-798"
+   ]
+  ],
+  [
+   "credential/secret",
+   "secret_signals",
+   [
+    "CWE-200",
+    "CWE-312",
+    "CWE-319",
+    "CWE-522",
+    "CWE-532",
+    "CWE-798",
+    "CWE-922"
+   ]
+  ],
+  [
+   "request-input",
+   "request_input_signals",
+   [
+    "CWE-113",
+    "CWE-177",
+    "CWE-184",
+    "CWE-20",
+    "CWE-235",
+    "CWE-284",
+    "CWE-352",
+    "CWE-400",
+    "CWE-601",
+    "CWE-74",
+    "CWE-77",
+    "CWE-770",
+    "CWE-78",
+    "CWE-79",
+    "CWE-862",
+    "CWE-863",
+    "CWE-89",
+    "CWE-94",
+    "CWE-95"
+   ]
+  ],
+  [
+   "file-upload",
+   "upload_signals",
+   [
+    "CWE-20",
+    "CWE-22",
+    "CWE-400",
+    "CWE-409",
+    "CWE-434",
+    "CWE-770"
+   ]
+  ],
+  [
+   "web-endpoint",
+   "route_files",
+   [
+    "CWE-20",
+    "CWE-200",
+    "CWE-287",
+    "CWE-352",
+    "CWE-400",
+    "CWE-601",
+    "CWE-770",
+    "CWE-79",
+    "CWE-862",
+    "CWE-863"
+   ]
+  ],
+  [
+   "logging",
+   "logging_signals",
+   [
+    "CWE-117",
+    "CWE-200",
+    "CWE-532"
+   ]
+  ],
+  [
+   "structured-parser",
+   "parser_signals",
+   [
+    "CWE-1286",
+    "CWE-1287",
+    "CWE-20",
+    "CWE-400",
+    "CWE-674",
+    "CWE-770"
+   ]
+  ],
+  [
+   "external-configuration",
+   "configuration_signals",
+   [
+    "CWE-15",
+    "CWE-16",
+    "CWE-200",
+    "CWE-269",
+    "CWE-732",
+    "CWE-798",
+    "CWE-922"
+   ]
+  ]
+ ],
+ "PRIMARY_PROFILE_SIGNAL_CWE_IDS": {
+  "auth_signals": [
+   "CWE-284",
+   "CWE-287",
+   "CWE-306",
+   "CWE-307",
+   "CWE-384",
+   "CWE-521",
+   "CWE-640"
+  ],
+  "data_store_signals": [
+   "CWE-200",
+   "CWE-89",
+   "CWE-943"
+  ],
+  "template_signals": [
+   "CWE-116",
+   "CWE-79"
+  ],
+  "file_io_signals": [
+   "CWE-22",
+   "CWE-434",
+   "CWE-73"
+  ],
+  "network_client_signals": [
+   "CWE-295",
+   "CWE-319",
+   "CWE-918"
+  ],
+  "deserialization_signals": [
+   "CWE-502"
+  ],
+  "crypto_signals": [
+   "CWE-321",
+   "CWE-327",
+   "CWE-328",
+   "CWE-330"
+  ],
+  "native_code_signals": [
+   "CWE-119",
+   "CWE-120",
+   "CWE-125",
+   "CWE-190",
+   "CWE-416",
+   "CWE-476",
+   "CWE-787"
+  ],
+  "iac_signals": [
+   "CWE-16",
+   "CWE-276",
+   "CWE-732",
+   "CWE-798"
+  ],
+  "secret_signals": [
+   "CWE-312",
+   "CWE-319",
+   "CWE-522",
+   "CWE-798"
+  ],
+  "request_input_signals": [
+   "CWE-20",
+   "CWE-74",
+   "CWE-77",
+   "CWE-78",
+   "CWE-79",
+   "CWE-89",
+   "CWE-94"
+  ],
+  "upload_signals": [
+   "CWE-22",
+   "CWE-434"
+  ],
+  "logging_signals": [
+   "CWE-117",
+   "CWE-532"
+  ],
+  "parser_signals": [
+   "CWE-1286",
+   "CWE-20"
+  ],
+  "configuration_signals": [
+   "CWE-15",
+   "CWE-16"
+  ]
+ },
+ "FRAMEWORK_PROFILE_SIGNAL_RULES": [
+  [
+   "web-application framework",
+   [
+    "django",
+    "echo",
+    "express",
+    "fastapi",
+    "fiber",
+    "flask",
+    "gin",
+    "gorilla",
+    "grpc",
+    "hapi",
+    "jetty",
+    "koa",
+    "micronaut",
+    "nestjs",
+    "netty",
+    "next",
+    "quarkus",
+    "rails",
+    "resteasy",
+    "spring",
+    "tomcat",
+    "undertow",
+    "vaadin",
+    "vertx"
+   ],
+   [
+    "CWE-20",
+    "CWE-287",
+    "CWE-400",
+    "CWE-79",
+    "CWE-862"
+   ],
+   50
+  ],
+  [
+   "web-application related surface",
+   [
+    "django",
+    "echo",
+    "express",
+    "fastapi",
+    "fiber",
+    "flask",
+    "gin",
+    "gorilla",
+    "grpc",
+    "hapi",
+    "jetty",
+    "koa",
+    "micronaut",
+    "nestjs",
+    "netty",
+    "next",
+    "quarkus",
+    "rails",
+    "resteasy",
+    "spring",
+    "tomcat",
+    "undertow",
+    "vaadin",
+    "vertx"
+   ],
+   [
+    "CWE-200",
+    "CWE-352",
+    "CWE-601",
+    "CWE-770",
+    "CWE-863"
+   ],
+   40
+  ],
+  [
+   "event-driven server resource surface",
+   [
+    "grpc",
+    "netty",
+    "undertow",
+    "vertx"
+   ],
+   [
+    "CWE-400",
+    "CWE-404",
+    "CWE-770",
+    "CWE-772"
+   ],
+   50
+  ],
+  [
+   "browser-interface framework",
+   [
+    "next",
+    "react"
+   ],
+   [
+    "CWE-116",
+    "CWE-451",
+    "CWE-79"
+   ],
+   40
+  ]
+ ],
+ "AUTOMATIC_SELECTION_POLICY": "mitre_mode_aware_repository_relevance_v6",
+ "EXPLICIT_SELECTION_POLICY": "explicit_cwe_ids",
+ "SIMPLIFIED_MAPPING_VIEW": "CWE-1003",
+ "SOFTWARE_DEVELOPMENT_VIEW": "CWE-699",
+ "CURRENT_TOP_25_BASELINE_NAME": "MITRE CWE Top 25 (CWE-1435)",
+ "AUTO_RELATIONSHIP_FAMILY_CAP": 2,
+ "COMMON_AUTOMATIC_SELECTION_NOTES": [
+  "Platform mismatches affect rank rather than eligibility.",
+  "Repository-specific slots prefer direct source evidence, then category evidence, then MITRE relationship expansion; test and generated-code evidence is retained at lower weight.",
+  "Remaining tie-breakers are exact platform matches, CVE mapping guidance, abstraction, exploit likelihood, and status."
+ ],
+ "EXPLICIT_SELECTION_NOTES": [
+  "Exact user-supplied CWE IDs are preserved in request order; automatic limits and filters do not apply."
+ ],
+ "LANGUAGE_BY_SUFFIX": {
+  ".py": "python",
+  ".js": "javascript",
+  ".jsx": "javascript",
+  ".ts": "typescript",
+  ".tsx": "typescript",
+  ".java": "java",
+  ".go": "go",
+  ".rb": "ruby",
+  ".php": "php",
+  ".cs": "csharp",
+  ".c": "c",
+  ".cc": "cpp",
+  ".cpp": "cpp",
+  ".cxx": "cpp",
+  ".h": "c",
+  ".hpp": "cpp",
+  ".rs": "rust",
+  ".tf": "terraform",
+  ".v": "verilog",
+  ".vh": "verilog",
+  ".vhd": "vhdl",
+  ".vhdl": "vhdl",
+  ".kt": "kotlin",
+  ".kts": "kotlin",
+  ".scala": "scala",
+  ".groovy": "groovy",
+  ".sh": "shell",
+  ".bash": "shell",
+  ".zsh": "shell",
+  ".lua": "lua",
+  ".dart": "dart",
+  ".swift": "swift",
+  ".m": "objective-c",
+  ".mm": "objective-cpp",
+  ".sol": "solidity",
+  ".ex": "elixir",
+  ".exs": "elixir",
+  ".erl": "erlang",
+  ".hrl": "erlang",
+  ".vue": "vue",
+  ".s": "assembly",
+  ".asm": "assembly"
+ },
+ "FRAMEWORK_DEPENDENCY_EXACT": {
+  "flask": "flask",
+  "fastapi": "fastapi",
+  "django": "django",
+  "express": "express",
+  "next": "next",
+  "react": "react",
+  "react-native": "react-native",
+  "koa": "koa",
+  "@hapi/hapi": "hapi",
+  "@nestjs/core": "nestjs",
+  "@grpc/grpc-js": "grpc",
+  "rails": "rails",
+  "torch": "torch",
+  "pytorch": "pytorch",
+  "tensorflow": "tensorflow",
+  "keras": "keras",
+  "scikit-learn": "scikit-learn",
+  "sklearn": "sklearn",
+  "github.com/gin-gonic/gin": "gin",
+  "github.com/gorilla/mux": "gorilla",
+  "github.com/labstack/echo": "echo",
+  "github.com/gofiber/fiber": "fiber",
+  "google.golang.org/grpc": "grpc"
+ },
+ "FRAMEWORK_DEPENDENCY_PREFIXES": {
+  "org.springframework": "spring",
+  "spring-": "spring",
+  "io.vertx": "vertx",
+  "vertx-": "vertx",
+  "io.netty": "netty",
+  "netty-": "netty",
+  "io.undertow": "undertow",
+  "undertow-": "undertow",
+  "io.grpc": "grpc",
+  "grpc-": "grpc",
+  "org.eclipse.jetty": "jetty",
+  "jetty-": "jetty",
+  "io.quarkus": "quarkus",
+  "quarkus-": "quarkus",
+  "io.micronaut": "micronaut",
+  "micronaut-": "micronaut",
+  "org.apache.tomcat": "tomcat",
+  "tomcat-": "tomcat",
+  "org.jboss.resteasy": "resteasy",
+  "resteasy-": "resteasy",
+  "com.vaadin": "vaadin",
+  "vaadin-": "vaadin",
+  "androidx.": "android"
+ },
+ "DEPENDENCY_CAPABILITY_PREFIXES": {
+  "parser_signals": [
+   "ajv",
+   "com.fasterxml.jackson",
+   "com.google.code.gson",
+   "jsonschema",
+   "org.tomlj",
+   "org.yaml:snakeyaml",
+   "serde_json",
+   "serde_yaml",
+   "toml"
+  ],
+  "logging_signals": [
+   "ch.qos.logback",
+   "github.com/sirupsen/logrus",
+   "go.uber.org/zap",
+   "org.apache.logging.log4j",
+   "org.slf4j",
+   "pino",
+   "structlog",
+   "winston"
+  ],
+  "configuration_signals": [
+   "com.typesafe",
+   "configparser",
+   "dotenv",
+   "github.com/spf13/viper",
+   "org.apache.commons:commons-configuration",
+   "python-dotenv"
+  ]
+ },
+ "DEPENDENCY_MANIFEST_NAMES": [
+  "build.gradle",
+  "build.gradle.kts",
+  "cargo.toml",
+  "composer.json",
+  "gemfile",
+  "go.mod",
+  "package.json",
+  "pom.xml",
+  "pyproject.toml",
+  "requirements.txt"
+ ],
+ "SECURITY_SENSITIVE_PATH_MARKERS": [
+  "accesscontrol",
+  "archive",
+  "auth",
+  "command",
+  "crypto",
+  "csrf",
+  "deserialize",
+  "escape",
+  "permission",
+  "printer",
+  "redirect",
+  "requesthandler",
+  "sanitize",
+  "security",
+  "tls",
+  "terminal",
+  "upload",
+  "validate",
+  "validation",
+  "xsrf"
+ ],
+ "MAX_PROFILE_FILES": 300,
+ "MAX_PROFILE_FILE_BYTES": 1000000,
+ "MAX_PRIORITY_PROFILE_FILES": 75,
+ "SECRET_SIGNAL_PATTERN": "(?:^|[^a-z0-9])(?:password|passwd|api[_-]?key|secret|token|credential|(?:access|api|auth|bearer|csrf|id|refresh|session)[_-]?token)(?:s|[^a-z0-9]|$)",
+ "SENSITIVE_VALUE_TOKENS": [
+  "password",
+  "passwd",
+  "api_key",
+  "api key",
+  "secret",
+  "credential",
+  "access_token",
+  "access token",
+  "accesstoken",
+  "auth_token",
+  "auth token",
+  "authtoken",
+  "bearer token",
+  "refresh_token",
+  "refresh token",
+  "refreshtoken",
+  "session_token",
+  "session token",
+  "sessiontoken"
+ ],
+ "EVIDENCE_RULES": [
+  {
+   "label": "regular-expression processing",
+   "cwe_scores": [
+    [
+     "CWE-1333",
+     110
+    ],
+    [
+     "CWE-400",
+     75
+    ]
+   ],
+   "tokens": [
+    "new regexp(",
+    "regexp.compile(",
+    "re.compile(",
+    "regex::new(",
+    "pattern.compile("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "schema and format validation",
+   "cwe_scores": [
+    [
+     "CWE-1286",
+     120
+    ],
+    [
+     "CWE-20",
+     100
+    ]
+   ],
+   "tokens": [
+    "jsonschema.validate(",
+    "jsonschema.draft",
+    "jsonschemafactory",
+    "schemafactory.newinstance(",
+    "new ajv(",
+    "ajv.compile("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "HTTP header and message parsing",
+   "cwe_scores": [
+    [
+     "CWE-113",
+     125
+    ],
+    [
+     "CWE-444",
+     125
+    ],
+    [
+     "CWE-436",
+     120
+    ]
+   ],
+   "tokens": [
+    "content-length",
+    "transfer-encoding",
+    "httpheaders",
+    "httpheader",
+    "http2headers",
+    "header validation",
+    "headername",
+    "headervalue"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "outbound HTTP request construction",
+   "cwe_scores": [
+    [
+     "CWE-918",
+     120
+    ],
+    [
+     "CWE-601",
+     75
+    ]
+   ],
+   "tokens": [
+    "http.request(",
+    "https.request(",
+    "http.newrequest(",
+    "http.newrequestwithcontext(",
+    ".client.do(",
+    "client.do(",
+    "requests.get(",
+    "requests.post(",
+    "httpx.get(",
+    "httpx.post("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "unbounded request-body accumulation",
+   "cwe_scores": [
+    [
+     "CWE-400",
+     125
+    ],
+    [
+     "CWE-770",
+     120
+    ]
+   ],
+   "tokens": [
+    "body += chunk",
+    "body = body + chunk",
+    "chunks.push(chunk",
+    "buffer.concat(chunks"
+   ],
+   "languages": [
+    "javascript",
+    "typescript"
+   ],
+   "required_token_groups": [
+    [
+     ".on('data'",
+     ".on(\"data\"",
+     ".on(`data`"
+    ]
+   ]
+  },
+  {
+   "label": "parser/resource-boundary handling",
+   "cwe_scores": [
+    [
+     "CWE-400",
+     110
+    ],
+    [
+     "CWE-770",
+     90
+    ],
+    [
+     "CWE-1286",
+     110
+    ],
+    [
+     "CWE-1287",
+     110
+    ],
+    [
+     "CWE-674",
+     115
+    ],
+    [
+     "CWE-754",
+     75
+    ]
+   ],
+   "tokens": [
+    "maxdepth",
+    "max_depth",
+    "max_recursion_depth",
+    "recursionlimit",
+    "recursive depth",
+    "maximum nesting",
+    "nesting depth",
+    "parsing depth"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "structured-data parser validation",
+   "cwe_scores": [
+    [
+     "CWE-20",
+     110
+    ],
+    [
+     "CWE-1286",
+     100
+    ],
+    [
+     "CWE-400",
+     70
+    ]
+   ],
+   "tokens": [
+    "yaml.node",
+    "json.loads(",
+    "yaml.safe_load(",
+    "tomllib.loads(",
+    "toml.loads(",
+    "serde_json::from_",
+    "serde_yaml::from_"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "security-sensitive randomness",
+   "cwe_scores": [
+    [
+     "CWE-338",
+     120
+    ],
+    [
+     "CWE-330",
+     100
+    ]
+   ],
+   "tokens": [
+    "new random(",
+    "math.random(",
+    "random.random(",
+    "rand.newsource(",
+    "java.util.random",
+    ".nextrandom"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "dynamic code or template generation",
+   "cwe_scores": [
+    [
+     "CWE-94",
+     125
+    ],
+    [
+     "CWE-95",
+     100
+    ],
+    [
+     "CWE-1336",
+     90
+    ],
+    [
+     "CWE-20",
+     75
+    ]
+   ],
+   "tokens": [
+    "new function(",
+    "eval(",
+    "exec(",
+    "compile(template",
+    "template.compile(",
+    "groovyshell",
+    "scriptengine"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "unsafe or unauthenticated deserialization",
+   "cwe_scores": [
+    [
+     "CWE-502",
+     125
+    ],
+    [
+     "CWE-345",
+     110
+    ],
+    [
+     "CWE-913",
+     115
+    ],
+    [
+     "CWE-184",
+     115
+    ]
+   ],
+   "tokens": [
+    "pickle.loads",
+    "pickle.load(",
+    "torch.load(",
+    "yaml.load(",
+    "marshal.loads",
+    "objectinputstream",
+    "readobject(",
+    "deserialize("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "unsafe memory and buffer access",
+   "cwe_scores": [
+    [
+     "CWE-119",
+     120
+    ],
+    [
+     "CWE-125",
+     115
+    ],
+    [
+     "CWE-787",
+     115
+    ],
+    [
+     "CWE-120",
+     95
+    ]
+   ],
+   "tokens": [
+    "unsafe fn",
+    "unsafe {",
+    "get_unchecked",
+    "from_raw_parts",
+    "unsafe.pointer",
+    "memcpy(",
+    "strcpy(",
+    "strcat("
+   ],
+   "languages": [
+    "c",
+    "cpp",
+    "go",
+    "rust"
+   ],
+   "required_token_groups": []
+  },
+  {
+   "label": "file serving and resource exposure",
+   "cwe_scores": [
+    [
+     "CWE-402",
+     115
+    ],
+    [
+     "CWE-668",
+     110
+    ],
+    [
+     "CWE-22",
+     105
+    ],
+    [
+     "CWE-552",
+     95
+    ]
+   ],
+   "tokens": [
+    "staticfileserver",
+    "readallbytes(",
+    "send_file(",
+    "servefile(",
+    "http.fileserver(",
+    "static resource",
+    "static file",
+    "public directory"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "privilege and authorization controls",
+   "cwe_scores": [
+    [
+     "CWE-250",
+     120
+    ],
+    [
+     "CWE-862",
+     115
+    ],
+    [
+     "CWE-863",
+     105
+    ],
+    [
+     "CWE-732",
+     90
+    ]
+   ],
+   "tokens": [
+    "securitycontext",
+    "privileged: true",
+    "net_admin",
+    "setuid(",
+    "seteuid(",
+    "runasuser",
+    "rolebinding",
+    "clusterrole",
+    "authorizationmanager",
+    "securityfilterchain",
+    "accesscontrol"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "authorization and access-control enforcement",
+   "cwe_scores": [
+    [
+     "CWE-862",
+     125
+    ],
+    [
+     "CWE-863",
+     115
+    ],
+    [
+     "CWE-285",
+     100
+    ]
+   ],
+   "tokens": [
+    "authorizationmanager",
+    "securityfilterchain",
+    "accesscontrol",
+    "checkpermission(",
+    "haspermission(",
+    "permissionchecker",
+    "securityinterceptor"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "anti-CSRF request protection",
+   "cwe_scores": [
+    [
+     "CWE-352",
+     130
+    ]
+   ],
+   "tokens": [
+    "csrf",
+    "xsrf",
+    "anti-forgery",
+    "antiforgery"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "cryptographic signature verification",
+   "cwe_scores": [
+    [
+     "CWE-347",
+     125
+    ],
+    [
+     "CWE-345",
+     115
+    ],
+    [
+     "CWE-295",
+     110
+    ]
+   ],
+   "tokens": [
+    "signature.getinstance(",
+    ".initverify(",
+    "verify(signature",
+    "verify_signature",
+    "verifysignature",
+    "publickey.verify(",
+    "signedxml",
+    "checksignature("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "dynamic object property mutation",
+   "cwe_scores": [
+    [
+     "CWE-1321",
+     125
+    ],
+    [
+     "CWE-915",
+     100
+    ],
+    [
+     "CWE-913",
+     75
+    ]
+   ],
+   "tokens": [
+    "__proto__",
+    "constructor.prototype",
+    "object.setprototypeof(",
+    "prototype pollution",
+    "prototypepollution"
+   ],
+   "languages": [
+    "javascript",
+    "typescript"
+   ],
+   "required_token_groups": []
+  },
+  {
+   "label": "ignored return value or error handling",
+   "cwe_scores": [
+    [
+     "CWE-252",
+     120
+    ],
+    [
+     "CWE-755",
+     110
+    ],
+    [
+     "CWE-754",
+     100
+    ],
+    [
+     "CWE-703",
+     110
+    ]
+   ],
+   "tokens": [
+    ", _ :=",
+    "_, _ =",
+    "catch (exception ignored",
+    "catch (ignored",
+    "except pass",
+    "except:\n        pass"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "LDAP query construction",
+   "cwe_scores": [
+    [
+     "CWE-90",
+     125
+    ],
+    [
+     "CWE-74",
+     90
+    ],
+    [
+     "CWE-20",
+     75
+    ]
+   ],
+   "tokens": [
+    "ldap.search(",
+    "ldapsearch(",
+    "searchfilter",
+    "ldap filter",
+    "dircontext.search("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "contextual output encoding",
+   "cwe_scores": [
+    [
+     "CWE-116",
+     120
+    ],
+    [
+     "CWE-79",
+     115
+    ],
+    [
+     "CWE-74",
+     80
+    ]
+   ],
+   "tokens": [
+    "html.escapestring(",
+    "html.escape(",
+    "encodeforhtml(",
+    "escapehtml(",
+    "dompurify.sanitize(",
+    "output encoding",
+    "contextual escape"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "terminal and control-sequence output",
+   "cwe_scores": [
+    [
+     "CWE-74",
+     120
+    ],
+    [
+     "CWE-116",
+     110
+    ],
+    [
+     "CWE-150",
+     95
+    ]
+   ],
+   "tokens": [
+    "\\x1b[",
+    "\\u001b[",
+    "\\033[",
+    "ansi escape",
+    "escape sequence"
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     ".sprint(",
+     "fmt.fprint",
+     "writer",
+     "output"
+    ]
+   ]
+  },
+  {
+   "label": "shared-state synchronization",
+   "cwe_scores": [
+    [
+     "CWE-362",
+     120
+    ],
+    [
+     "CWE-662",
+     115
+    ],
+    [
+     "CWE-667",
+     75
+    ]
+   ],
+   "tokens": [
+    "sync.mutex",
+    "sync.rwmutex",
+    ".lock()",
+    ".unlock()",
+    "synchronized (",
+    "reentrantlock",
+    "pthread_mutex",
+    "atomic::",
+    "nonreentrant",
+    "reentrancyguard",
+    "reentrancy_guard"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "temporary-file creation and cleanup",
+   "cwe_scores": [
+    [
+     "CWE-377",
+     120
+    ],
+    [
+     "CWE-459",
+     120
+    ],
+    [
+     "CWE-276",
+     70
+    ]
+   ],
+   "tokens": [
+    "tempfile.mktemp(",
+    "namedtemporaryfile(",
+    "mkstemp(",
+    "createtempfile(",
+    "os.tempdir(",
+    "ioutil.tempfile(",
+    "os.createtemp("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "sensitive-data logging",
+   "cwe_scores": [
+    [
+     "CWE-532",
+     115
+    ],
+    [
+     "CWE-200",
+     75
+    ]
+   ],
+   "tokens": [
+    "logger.info(",
+    "logger.debug(",
+    "log.printf(",
+    "log.println(",
+    "logging.info(",
+    "console.log("
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     "password",
+     "passwd",
+     "api_key",
+     "api key",
+     "secret",
+     "credential",
+     "access_token",
+     "access token",
+     "accesstoken",
+     "auth_token",
+     "auth token",
+     "authtoken",
+     "bearer token",
+     "refresh_token",
+     "refresh token",
+     "refreshtoken",
+     "session_token",
+     "session token",
+     "sessiontoken"
+    ]
+   ]
+  },
+  {
+   "label": "archive or compressed-data expansion",
+   "cwe_scores": [
+    [
+     "CWE-409",
+     120
+    ],
+    [
+     "CWE-400",
+     105
+    ],
+    [
+     "CWE-770",
+     85
+    ]
+   ],
+   "tokens": [
+    "zipfile(",
+    "zipfile.zipfile(",
+    ".extractall(",
+    "gzip.newreader(",
+    "tarfile.open(",
+    "zipinputstream",
+    "gzipinputstream",
+    "decompress("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "URL decoding and repeated parameter handling",
+   "cwe_scores": [
+    [
+     "CWE-177",
+     120
+    ],
+    [
+     "CWE-235",
+     105
+    ],
+    [
+     "CWE-20",
+     75
+    ]
+   ],
+   "tokens": [
+    "queryunescape(",
+    "urldecode(",
+    "decodeuricomponent(",
+    "url.query()[",
+    "getparametervalues(",
+    "getall(",
+    "repeated parameter"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "sensitive configuration storage",
+   "cwe_scores": [
+    [
+     "CWE-922",
+     125
+    ],
+    [
+     "CWE-200",
+     90
+    ],
+    [
+     "CWE-312",
+     80
+    ]
+   ],
+   "tokens": [
+    "config.set(",
+    "self.set(",
+    "settings.set(",
+    "preferences.set(",
+    "write_config",
+    "save_config"
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     "password",
+     "passwd",
+     "api_key",
+     "api key",
+     "secret",
+     "credential",
+     "access_token",
+     "access token",
+     "accesstoken",
+     "auth_token",
+     "auth token",
+     "authtoken",
+     "bearer token",
+     "refresh_token",
+     "refresh token",
+     "refreshtoken",
+     "session_token",
+     "session token",
+     "sessiontoken"
+    ],
+    [
+     "config",
+     "settings",
+     "preferences"
+    ]
+   ]
+  },
+  {
+   "label": "HTTP redirect destination handling",
+   "cwe_scores": [
+    [
+     "CWE-601",
+     125
+    ],
+    [
+     "CWE-20",
+     70
+    ]
+   ],
+   "tokens": [
+    "http.redirecthandler(",
+    "http.redirect(",
+    "response.redirect(",
+    "res.redirect(",
+    "redirect(url",
+    "redirect_uri",
+    "redirect_url"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "conflicting HTTP parameter sources",
+   "cwe_scores": [
+    [
+     "CWE-235",
+     125
+    ],
+    [
+     "CWE-20",
+     75
+    ]
+   ],
+   "tokens": [
+    "req.params[",
+    "request.path_params",
+    ".path_params["
+   ],
+   "languages": [
+    "javascript",
+    "python",
+    "typescript"
+   ],
+   "required_token_groups": [
+    [
+     "req.query[",
+     "request.query_params",
+     ".query_params["
+    ]
+   ]
+  },
+  {
+   "label": "operating-system command execution",
+   "cwe_scores": [
+    [
+     "CWE-78",
+     130
+    ],
+    [
+     "CWE-77",
+     120
+    ]
+   ],
+   "tokens": [
+    "childprocess.exec(",
+    "child_process.exec(",
+    "exec.command(",
+    "runtime.getruntime().exec(",
+    "subprocess.popen(",
+    "subprocess.run(",
+    "os.system(",
+    "require('child_process').exec",
+    "require(\"child_process\").exec",
+    "require('child_process').spawn",
+    "require(\"child_process\").spawn"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "legacy or weak cryptographic algorithm",
+   "cwe_scores": [
+    [
+     "CWE-327",
+     125
+    ],
+    [
+     "CWE-328",
+     105
+    ]
+   ],
+   "tokens": [
+    "hashlib.md5(",
+    "hashlib.sha1(",
+    "messagedigest.getinstance(\"md5",
+    "messagedigest.getinstance(\"sha-1",
+    "messagedigest.getinstance('md5",
+    "messagedigest.getinstance('sha-1",
+    "cipher.getinstance(\"des",
+    "cipher.getinstance('des",
+    "md5.new(",
+    "sha1.new(",
+    "des.new(",
+    "des_ecb",
+    "createcipher('des",
+    "createcipher(\"des",
+    "rc4"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "user-influenced path construction",
+   "cwe_scores": [
+    [
+     "CWE-22",
+     120
+    ],
+    [
+     "CWE-35",
+     110
+    ],
+    [
+     "CWE-36",
+     105
+    ]
+   ],
+   "tokens": [
+    "filepath.join(",
+    "path.join(",
+    "paths.get(",
+    ".resolve(user",
+    "joinpath(user"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "allow-list and deny-list protection",
+   "cwe_scores": [
+    [
+     "CWE-693",
+     125
+    ],
+    [
+     "CWE-184",
+     120
+    ]
+   ],
+   "tokens": [
+    "allowlist",
+    "allow_list",
+    "whitelist"
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     "denylist",
+     "deny_list",
+     "blacklist",
+     "dangerous"
+    ]
+   ]
+  },
+  {
+   "label": "compiler control-flow generation",
+   "cwe_scores": [
+    [
+     "CWE-670",
+     120
+    ],
+    [
+     "CWE-691",
+     115
+    ]
+   ],
+   "tokens": [
+    "codegen",
+    "compile_",
+    "compiler",
+    "emit_",
+    "generate_"
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     "jump",
+     "branch",
+     "label",
+     "opcode",
+     "control flow",
+     "control_flow"
+    ],
+    [
+     "ast",
+     "ir_",
+     "syntax",
+     "bytecode"
+    ]
+   ]
+  },
+  {
+   "label": "resource-consuming loop",
+   "cwe_scores": [
+    [
+     "CWE-1050",
+     110
+    ],
+    [
+     "CWE-400",
+     90
+    ]
+   ],
+   "tokens": [
+    "while (",
+    "while(",
+    "for (",
+    "for("
+   ],
+   "languages": [],
+   "required_token_groups": [
+    [
+     "stack.push(",
+     ".append(",
+     "open(",
+     "allocate(",
+     "malloc(",
+     ".read(",
+     ".write("
+    ]
+   ]
+  },
+  {
+   "label": "TLS peer-certificate verification",
+   "cwe_scores": [
+    [
+     "CWE-295",
+     125
+    ],
+    [
+     "CWE-319",
+     80
+    ]
+   ],
+   "tokens": [
+    "verify_ssl",
+    "verifyssl",
+    "insecure_skip_verify",
+    "insecureskipverify",
+    "checkhostname",
+    "check_hostname",
+    "certificateverify"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "message and allocation size limits",
+   "cwe_scores": [
+    [
+     "CWE-400",
+     125
+    ],
+    [
+     "CWE-770",
+     115
+    ]
+   ],
+   "tokens": [
+    "maxrecvmessagesize",
+    "maxsendmessagesize",
+    "max_message_size",
+    "maxmessagesize",
+    "maxpayloadsize",
+    "max_payload_size",
+    "maxbuffersize",
+    "max_buffer_size",
+    "io.limitreader(",
+    "resourceexhausted"
+   ],
+   "languages": [],
+   "required_token_groups": []
+  },
+  {
+   "label": "authentication gate",
+   "cwe_scores": [
+    [
+     "CWE-287",
+     125
+    ],
+    [
+     "CWE-306",
+     90
+    ]
+   ],
+   "tokens": [
+    "@login_required",
+    "flask_login.login_required",
+    "authenticationmanager",
+    "passport.authenticate(",
+    "jwt.verify(",
+    "jose.jwt.decode("
+   ],
+   "languages": [],
+   "required_token_groups": []
+  }
+ ]
+}
