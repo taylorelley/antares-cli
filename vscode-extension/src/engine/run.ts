@@ -2,7 +2,12 @@
 // SecurityWorkflowService and stream progress/result events back to the extension.
 
 import { ProgressCallback } from "../antares/agent/types";
-import { QueryRequest, SecurityWorkflowService, SweepRequest } from "../antares/core/service";
+import {
+  QueryRequest,
+  SecurityWorkflowService,
+  SweepRequest,
+  VerificationRequest,
+} from "../antares/core/service";
 import { findingToDict } from "../antares/output/finding";
 import { AntaresResult, HostEvent, HostRequest } from "../findings";
 
@@ -20,6 +25,57 @@ export async function runEngine(
 
   const service = new SecurityWorkflowService(ctx.dataDir);
   const apiKey = request.api_key ?? ctx.apiKey;
+
+  if (request.mode === "verify") {
+    if (!request.groups || request.groups.length === 0) {
+      throw new Error("Verify mode requires at least one verification group.");
+    }
+    const verifyRequest: VerificationRequest = {
+      target: request.target,
+      groups: request.groups,
+      model: request.model,
+      endpoint: request.endpoint,
+      apiStyle: request.api_style,
+      apiKey,
+      terminalCallBudget: request.terminal_call_budget,
+      workers: request.workers,
+    };
+    const results = await service.runVerification(verifyRequest, (event) => {
+      ctx.emit({
+        type: "verify_worker",
+        event: event.event,
+        group_index: event.groupIndex,
+        file: event.group.file,
+        cweId: event.group.cweId,
+        verdict: event.verdict,
+      });
+    });
+    // Return a lightweight result with verdicts mapped into findings
+    const findings = results.map((r) => ({
+      title: r.group.message,
+      file_path: r.group.file,
+      cwe_ids: [r.group.cweId],
+      engine: "opengrep" as const,
+      severity: "WARNING" as const,
+      range: {
+        start: { line: r.group.line, col: 1 },
+        end: { line: r.group.line, col: 1 },
+      },
+      verification: r.verdict,
+    }));
+    const result: AntaresResult = {
+      summary: {
+        total_findings: findings.length,
+        tool_call_count: 0,
+        duration_seconds: 0,
+        cwe_ids_triggered: [...new Set(findings.flatMap((f) => f.cwe_ids))],
+      },
+      findings,
+      metadata: { mode: "verify" },
+    };
+    ctx.emit({ type: "result", result });
+    return result;
+  }
 
   if (request.mode === "sweep") {
     const sweepRequest: SweepRequest = {

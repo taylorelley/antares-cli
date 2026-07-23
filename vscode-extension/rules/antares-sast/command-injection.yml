@@ -1,0 +1,57 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-78-python
+    message: "Possible OS command injection via shell execution. Avoid passing user input to shell commands."
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-78: Improper Neutralization of Special Elements used in an OS Command"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              os.system("..." + $VAR + "...")
+          - pattern: |
+              os.popen("..." + $VAR + "...")
+          - pattern: |
+              subprocess.call("..." + $VAR + "...", shell=True)
+          - pattern: |
+              subprocess.Popen("..." + $VAR + "...", shell=True)
+          - pattern: |
+              subprocess.run("..." + $VAR + "...", shell=True)
+
+  - id: antares-78-javascript
+    message: "Possible OS command injection via shell execution. Avoid shell option with user input."
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-78: Improper Neutralization of Special Elements used in an OS Command"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              child_process.exec("..." + $VAR + "...")
+          - pattern: |
+              child_process.execSync("..." + $VAR + "...")
+          - pattern: |
+              child_process.spawn($SHELL, ["-c", "..." + $VAR + "..."])
+          - pattern: |
+              exec("..." + $VAR + "...")
+          - pattern: |
+              execSync("..." + $VAR + "...")
+
+  - id: antares-78-java
+    message: "Possible OS command injection via Runtime.exec(). Avoid constructing commands with user input."
+    severity: ERROR
+    languages: [java]
+    metadata:
+      cwe: "CWE-78: Improper Neutralization of Special Elements used in an OS Command"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              Runtime.getRuntime().exec("..." + $VAR + "...")
+          - pattern: |
+              Runtime.getRuntime().exec($ARR)
+            message: "Possible OS command injection via Runtime.exec(). Validate all elements if array contains user input."

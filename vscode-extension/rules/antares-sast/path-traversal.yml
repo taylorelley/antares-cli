@@ -1,0 +1,58 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-22-python
+    message: "Possible path traversal vulnerability. Validate and sanitize user-controlled file paths."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              open($ROOT + "/" + $USER_PATH, ...)
+          - pattern: |
+              open(os.path.join($ROOT, $USER_PATH), ...)
+          - pattern: |
+              Path($ROOT + "/" + $USER_PATH)
+          - pattern: |
+              Path(os.path.join($ROOT, $USER_PATH))
+
+  - id: antares-22-javascript
+    message: "Possible path traversal vulnerability. Validate and sanitize user-controlled file paths."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fs.readFileSync($ROOT + "/" + $USER_PATH)
+          - pattern: |
+              fs.readFile($ROOT + "/" + $USER_PATH, ...)
+          - pattern: |
+              fs.readdirSync($ROOT + "/" + $USER_PATH)
+          - pattern: |
+              fs.createReadStream($ROOT + "/" + $USER_PATH)
+          - pattern: |
+              path.join($ROOT, $USER_PATH)
+
+  - id: antares-22-java
+    message: "Possible path traversal vulnerability. Validate and sanitize user-controlled file paths."
+    severity: WARNING
+    languages: [java]
+    metadata:
+      cwe: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new File($BASEPATH + "/" + $USER_PATH)
+          - pattern: |
+              new java.io.File($BASEPATH + "/" + $USER_PATH)
+          - pattern: |
+              Paths.get($BASEPATH + "/" + $USER_PATH)
+          - pattern: |
+              fileSystem.getPath($BASEPATH + "/" + $USER_PATH)

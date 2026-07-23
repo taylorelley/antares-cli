@@ -163,6 +163,80 @@ export class SecurityWorkflowService {
     };
     return makeWorkflowResult(findings, summary, metadata);
   }
+
+  async runVerification(
+    request: VerificationRequest,
+    onEvent?: (event: VerificationWorkerEvent) => void
+  ): Promise<VerificationResult[]> {
+    const backend = buildRemoteBackend(request);
+    const adapter = resolveModelAdapter(request.model ?? "antares");
+    const cweDatabase = CweDatabase.loadDefault(this.dataDir);
+
+    // WorkerTask per verification group (reuse runOrchestratedSweep for parallelism)
+    const tasks: WorkerTask[] = request.groups.map((group) => ({
+      cweId: group.cweId,
+      prompt: verificationPrompt(group),
+      terminalCallBudget: request.terminalCallBudget ?? null,
+    }));
+
+    // Wrap group index into events
+    const wrappedOnEvent = onEvent
+      ? (event: SweepWorkerEvent) => {
+          // Find the group matching this cweId — for verification each task is a distinct group
+          const groupIdx = request.groups.findIndex((g) => g.cweId === event.cweId);
+          if (groupIdx === -1) return;
+          const group = request.groups[groupIdx];
+          onEvent({
+            event: event.event === "progress" ? "started" : (event.event as "started" | "completed" | "failed"),
+            groupIndex: groupIdx,
+            group,
+            verdict: undefined,
+            errorMessage: event.errorMessage,
+          });
+        }
+      : undefined;
+
+    const merged = await runOrchestratedSweep(tasks, {
+      target: request.target,
+      backend,
+      cweDatabase,
+      adapter,
+      workerCount: request.workers && request.workers > 0 ? request.workers : 8,
+      onEvent: wrappedOnEvent,
+    });
+
+    // Map each worker result to a verdict
+    const results: VerificationResult[] = request.groups.map((group, idx) => {
+      const workerResult = merged.workerResults[idx];
+      if (!workerResult || workerResult.errorMessage) {
+        return { group, verdict: "uncertain" };
+      }
+      // If the agent submitted findings that match the flagged file → verified
+      // If no findings → rejected
+      // Error case → uncertain
+      const fileFindings = workerResult.findings.filter(
+        (f) => f.file_path === group.file
+      );
+      if (fileFindings.length > 0) {
+        return { group, verdict: "verified", confidence: "medium" };
+      }
+      return { group, verdict: "rejected" };
+    });
+
+    // Emit completion events for each group
+    if (onEvent) {
+      for (let i = 0; i < results.length; i++) {
+        onEvent({
+          event: "completed",
+          groupIndex: i,
+          group: results[i].group,
+          verdict: results[i].verdict,
+        });
+      }
+    }
+
+    return results;
+  }
 }
 
 export function buildRemoteBackend(request: {
@@ -262,6 +336,59 @@ function isPlaceholderCweEntry(entry: CweEntry): boolean {
     entry.name.startsWith("Placeholder CWE") ||
     entry.description.startsWith("Offline placeholder entry")
   );
+}
+
+// ---------------------------------------------------------------------------
+// Verification types
+// ---------------------------------------------------------------------------
+
+export interface VerificationGroup {
+  file: string;
+  line: number;
+  cweId: string;
+  message: string;
+  snippet: string;
+}
+
+export interface VerificationRequest {
+  target: string;
+  groups: VerificationGroup[];
+  model?: string | null;
+  endpoint?: string | null;
+  apiStyle?: string | null;
+  apiKey?: string | null;
+  terminalCallBudget?: number | null;
+  workers?: number;
+}
+
+export interface VerificationResult {
+  group: VerificationGroup;
+  verdict: "verified" | "rejected" | "uncertain";
+  confidence?: string;
+}
+
+export interface VerificationWorkerEvent {
+  event: "started" | "completed" | "failed";
+  groupIndex: number;
+  group: VerificationGroup;
+  verdict?: "verified" | "rejected" | "uncertain";
+  errorMessage?: string;
+}
+
+/**
+ * Build the verification prompt for a single finding group.
+ */
+export function verificationPrompt(group: VerificationGroup): string {
+  return [
+    "Verify this suspected vulnerability:",
+    `- File: ${group.file}`,
+    `- Line: ${group.line}`,
+    `- CWE: ${group.cweId}`,
+    `- SAST tool reports: ${group.message}`,
+    `- Code snippet: ${group.snippet}`,
+    "",
+    "Investigate the code at the specified location. If the vulnerability is genuine, submit the file. If it's a false positive, declare no vulnerability found.",
+  ].join("\n");
 }
 
 export function cweAnalysisPrompt(

@@ -1,0 +1,42 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-502-python
+    message: "Possible deserialization vulnerability via pickle. Avoid unpickling untrusted data."
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              pickle.loads($UNTRUSTED_DATA)
+          - pattern: |
+              pickle.load($UNTRUSTED_FILE)
+          - pattern: |
+              shelve.open($UNTRUSTED_PATH)
+          - pattern: |
+              yaml.load($UNTRUSTED_DATA, Loader=yaml.Loader)
+          - pattern: |
+              yaml.load($UNTRUSTED_DATA)
+
+  - id: antares-502-java
+    message: "Possible deserialization vulnerability. Avoid deserializing untrusted data or use safe deserialization."
+    severity: ERROR
+    languages: [java]
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      category: security
+    pattern: |
+      new ObjectInputStream($UNTRUSTED_INPUT).readObject()
+
+  - id: antares-502-php
+    message: "Possible deserialization vulnerability. Avoid unserializing untrusted data."
+    severity: ERROR
+    languages: [php]
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      category: security
+    pattern: |
+      unserialize($UNTRUSTED_DATA)

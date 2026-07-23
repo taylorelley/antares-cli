@@ -3,3 +3,4 @@ dist/
 out/
 out-test/
 *.vsix
+bin/

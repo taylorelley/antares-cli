@@ -1,0 +1,68 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-327-python
+    message: "Use of weak cryptographic algorithm. Use a strong hashing algorithm like SHA-256 or bcrypt."
+    severity: INFO
+    languages: [python]
+    metadata:
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              hashlib.md5(...)
+          - pattern: |
+              hashlib.sha1(...)
+          - pattern: |
+              Crypto.Cipher.DES.new(...)
+          - pattern: |
+              Cryptodome.Cipher.DES.new(...)
+          - pattern: |
+              DES3.new(...)
+          - pattern: |
+              ARC4.new(...)
+
+  - id: antares-327-javascript
+    message: "Use of weak cryptographic algorithm. Use a strong algorithm like SHA-256 or bcrypt."
+    severity: INFO
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              crypto.createHash("md5")
+          - pattern: |
+              crypto.createHash("sha1")
+          - pattern: |
+              crypto.createHash("MD5")
+          - pattern: |
+              crypto.createHash("SHA1")
+          - pattern: |
+              CryptoJS.MD5(...)
+          - pattern: |
+              CryptoJS.SHA1(...)
+
+  - id: antares-327-java
+    message: "Use of weak cryptographic algorithm. Use a strong algorithm like SHA-256."
+    severity: INFO
+    languages: [java]
+    metadata:
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              MessageDigest.getInstance("MD5")
+          - pattern: |
+              MessageDigest.getInstance("SHA-1")
+          - pattern: |
+              Cipher.getInstance("DES/...")
+          - pattern: |
+              Cipher.getInstance("RC4/...")
+          - pattern: |
+              KeyGenerator.getInstance("DES")
+          - pattern: |
+              KeyGenerator.getInstance("RC4")

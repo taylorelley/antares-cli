@@ -1,0 +1,52 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-89-python
+    message: "Possible SQL injection via string concatenation or f-string. Use parameterized queries."
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              execute("..." + $VAR + "...")
+          - pattern: |
+              execute(f"...{$VAR}...")
+          - pattern: |
+              cursor.execute("..." + $VAR + "...")
+          - pattern: |
+              cursor.execute(f"...{$VAR}...")
+
+  - id: antares-89-javascript
+    message: "Possible SQL injection via string concatenation. Use parameterized queries or an ORM."
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              db.query("..." + $VAR + "...")
+          - pattern: |
+              db.execute("..." + $VAR + "...")
+          - pattern: |
+              connection.query("..." + $VAR + "...")
+
+  - id: antares-89-java
+    message: "Possible SQL injection via string concatenation. Use PreparedStatement with ? placeholders."
+    severity: ERROR
+    languages: [java]
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      category: security
+      technology: jdbc
+    patterns:
+      - pattern-either:
+          - pattern: |
+              Statement $S = $C.createStatement();
+              $S.executeQuery("..." + $VAR + "...")
+          - pattern: |
+              $S.executeQuery("..." + $VAR + "...")

@@ -43,11 +43,35 @@ export class DiagnosticsManager {
       const absolute = resolveFindingPath(targetDir, finding.file_path);
       const cwes = finding.cwe_ids.join(", ");
       const message = cwes ? `${cwes}: ${finding.title}` : finding.title;
-      // Antares localizes at file granularity; anchor the diagnostic at the file start.
-      const range = new vscode.Range(0, 0, 0, 0);
-      const diagnostic = new vscode.Diagnostic(range, message, severity);
-      diagnostic.source = "Antares";
-      if (finding.cwe_ids.length > 0) {
+
+      // Map verification status to diagnostic severity
+      let diagSeverity = severity;
+      if (finding.verification === "rejected") {
+        // Downgrade rejected findings to Hint
+        diagSeverity = vscode.DiagnosticSeverity.Hint;
+      } else if (finding.verification === "uncertain") {
+        // Uncertain → Warning
+        diagSeverity = vscode.DiagnosticSeverity.Warning;
+      }
+      // Verified → use original severity; unverified → use original severity
+
+      // Use precise range if available (opengrep findings), else file-level.
+      let range: vscode.Range;
+      if (finding.range) {
+        range = new vscode.Range(
+          finding.range.start.line - 1,
+          finding.range.start.col - 1,
+          finding.range.end.line - 1,
+          finding.range.end.col - 1
+        );
+      } else {
+        range = new vscode.Range(0, 0, 0, 0);
+      }
+      const diagnostic = new vscode.Diagnostic(range, message, diagSeverity);
+      diagnostic.source = finding.engine === "opengrep" ? "Antares (SAST)" : "Antares";
+      if (finding.rule_id) {
+        diagnostic.code = finding.rule_id;
+      } else if (finding.cwe_ids.length > 0) {
         diagnostic.code = finding.cwe_ids[0];
       }
       const tags: string[] = [];
@@ -56,6 +80,9 @@ export class DiagnosticsManager {
       }
       if (typeof finding.submission_rank === "number") {
         tags.push(`Rank: ${finding.submission_rank}`);
+      }
+      if (finding.verification) {
+        tags.push(`Verification: ${finding.verification}`);
       }
       if (tags.length > 0) {
         diagnostic.message = `${message} (${tags.join(", ")})`;

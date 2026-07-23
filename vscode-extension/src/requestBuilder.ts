@@ -15,6 +15,12 @@ export interface AntaresConfig {
   toolBudget: number;
   sweepWorkers: number;
   sweepMaxCwes: number;
+  opengrepBinaryPath: string;
+  opengrepRulesPath: string;
+  opengrepSeverity: string;
+  opengrepTimeoutSeconds: number;
+  opengrepIgnoreGlobs: string[];
+  opengrepMaxVerifiedFindings: number;
 }
 
 const PROVIDER_DEFAULT_ENDPOINT: Record<Provider, string | null> = {

@@ -1,0 +1,60 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-918-python
+    message: "Possible Server-Side Request Forgery via user-controlled URL. Validate and restrict target URLs."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-918: Server-Side Request Forgery"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              requests.get($USER_URL, ...)
+          - pattern: |
+              requests.post($USER_URL, ...)
+          - pattern: |
+              urllib.request.urlopen($USER_URL)
+          - pattern: |
+              urllib.urlopen($USER_URL)
+          - pattern: |
+              httpx.get($USER_URL, ...)
+
+  - id: antares-918-javascript
+    message: "Possible Server-Side Request Forgery via user-controlled URL. Validate and restrict target URLs."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-918: Server-Side Request Forgery"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fetch($USER_URL, ...)
+          - pattern: |
+              axios.get($USER_URL, ...)
+          - pattern: |
+              axios.post($USER_URL, ...)
+          - pattern: |
+              got($USER_URL, ...)
+          - pattern: |
+              request($USER_URL, ...)
+
+  - id: antares-918-java
+    message: "Possible Server-Side Request Forgery via user-controlled URL. Validate and restrict target URLs."
+    severity: WARNING
+    languages: [java]
+    metadata:
+      cwe: "CWE-918: Server-Side Request Forgery"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new URL($USER_URL).openConnection()
+          - pattern: |
+              new URL($USER_URL).openStream()
+          - pattern: |
+              URLConnection urlConnection = new URL($USER_URL).openConnection()
+          - pattern: |
+              HttpClient.newHttpClient().send(HttpRequest.newBuilder().uri(URI.create($USER_URL)).build(), ...)

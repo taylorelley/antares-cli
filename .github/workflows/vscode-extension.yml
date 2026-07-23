@@ -10,6 +10,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # Build & type-check the extension source (platform-independent)
+  # ---------------------------------------------------------------------------
   build:
     name: Build & package VSIX
     runs-on: ubuntu-latest
@@ -42,12 +45,10 @@ jobs:
           npm run pretest-unit
           npm run test-unit
 
-      - name: Package VSIX
-        id: package
+      - name: Package VSIX (linux-x64)
         run: |
+          node tools/fetch-opengrep.mjs linux-x64
           npm run vsix
-          version="$(node -p "require('./package.json').version")"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
@@ -56,23 +57,97 @@ jobs:
           path: vscode-extension/*.vsix
           if-no-files-found: error
 
+  # ---------------------------------------------------------------------------
+  # Platform-specific binary fetch + VSIX package matrix
+  # ---------------------------------------------------------------------------
+  package-matrix:
+    name: Package VSIX (${{ matrix.target }})
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-latest
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: darwin-x64
+            runner: macos-13
+          - target: darwin-arm64
+            runner: macos-latest
+          - target: win32-x64
+            runner: windows-latest
+          - target: alpine-x64
+            runner: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode-extension
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: ${{ github.event_name != 'pull_request' && 'npm' || '' }}
+          cache-dependency-path: vscode-extension/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch opengrep binary (${{ matrix.target }})
+        run: node tools/fetch-opengrep.mjs ${{ matrix.target }}
+
+      - name: Package VSIX (${{ matrix.target }})
+        run: npx vsce package --target ${{ matrix.target }} --no-dependencies -o antares-vscode-${{ matrix.target }}.vsix
+
+      - name: Upload VSIX artifact (${{ matrix.target }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: antares-vscode-${{ matrix.target }}
+          path: vscode-extension/antares-vscode-${{ matrix.target }}.vsix
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Release: attach all platform VSIXes to GitHub release
+  # ---------------------------------------------------------------------------
   release:
     name: Publish release
-    needs: build
+    needs: [build, package-matrix]
     if: startsWith(github.ref, 'refs/tags/vscode-v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     env:
-      # Mapped here so the publish step's `if` can test it — the `secrets` context
-      # is not allowed in `if` conditionals (using it fails the workflow at startup).
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
+    strategy:
+      matrix:
+        target:
+          - linux-x64
+          - linux-arm64
+          - darwin-x64
+          - darwin-arm64
+          - win32-x64
+          - alpine-x64
     steps:
-      - name: Download VSIX artifact
+      - name: Download VSIX artifact (${{ matrix.target }})
+        uses: actions/download-artifact@v4
+        with:
+          name: antares-vscode-${{ matrix.target }}
+          path: dist-vsix
+
+      - name: Download base VSIX artifact
         uses: actions/download-artifact@v4
         with:
           name: antares-vscode-${{ needs.build.outputs.version }}
           path: dist-vsix
+
+      - name: List VSIX files
+        run: ls -la dist-vsix/
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
@@ -80,9 +155,8 @@ jobs:
           name: Antares VS Code Extension ${{ github.ref_name }}
           files: dist-vsix/*.vsix
           generate_release_notes: true
-          fail_on_unmatched_files: true
+          fail_on_unmatched_files: false
 
-      # Optional: publish to the VS Code Marketplace when a VSCE_PAT secret is set.
       - name: Publish to Marketplace
         if: ${{ env.VSCE_PAT != '' }}
         working-directory: dist-vsix

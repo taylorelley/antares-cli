@@ -1,0 +1,52 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-94-python
+    message: "Possible code injection via eval/exec. Avoid evaluating user-supplied input."
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-94: Improper Control of Generation of Code"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              eval($USER_INPUT)
+          - pattern: |
+              exec($USER_INPUT)
+          - pattern: |
+              compile($USER_INPUT, ...)
+          - pattern: |
+              __import__($USER_INPUT)
+
+  - id: antares-94-javascript
+    message: "Possible code injection via eval or similar. Avoid evaluating user-supplied input."
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-94: Improper Control of Generation of Code"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              eval($USER_INPUT)
+          - pattern: |
+              Function($USER_INPUT)
+          - pattern: |
+              setTimeout($USER_INPUT, ...)
+          - pattern: |
+              setInterval($USER_INPUT, ...)
+
+  - id: antares-94-java
+    message: "Possible code injection via ScriptEngine eval. Avoid evaluating user-supplied input."
+    severity: ERROR
+    languages: [java]
+    metadata:
+      cwe: "CWE-94: Improper Control of Generation of Code"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ENGINE.eval($USER_INPUT)
+          - pattern: |
+              javax.script.ScriptEngineManager().getEngineByName(...).eval($USER_INPUT)

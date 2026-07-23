@@ -19,6 +19,12 @@ function config(overrides: Partial<AntaresConfig> = {}): AntaresConfig {
     toolBudget: 0,
     sweepWorkers: 4,
     sweepMaxCwes: 8,
+    opengrepBinaryPath: "",
+    opengrepRulesPath: "",
+    opengrepSeverity: "ALL",
+    opengrepTimeoutSeconds: 300,
+    opengrepIgnoreGlobs: [],
+    opengrepMaxVerifiedFindings: 25,
     ...overrides,
   };
 }

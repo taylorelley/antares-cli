@@ -1,0 +1,50 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-79-python
+    message: "Possible cross-site scripting vulnerability via unescaped template rendering. Use autoescaping or escape user input."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-79: Improper Neutralization of Input During Web Page Generation"
+      category: security
+      technology: flask
+    patterns:
+      - pattern-either:
+          - pattern: |
+              render_template_string("..." + $VAR + "...")
+          - pattern: |
+              Markup($USER_INPUT)
+          - pattern: |
+              format_html("..." + $VAR + "...")
+
+  - id: antares-79-javascript
+    message: "Possible cross-site scripting vulnerability via direct innerHTML assignment. Use textContent or sanitize input."
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      cwe: "CWE-79: Improper Neutralization of Input During Web Page Generation"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ELEMENT.innerHTML = "..." + $VAR + "..."
+          - pattern: |
+              $ELEMENT.innerHTML = $VAR
+          - pattern: |
+              document.write("..." + $VAR + "...")
+          - pattern: |
+              document.writeln("..." + $VAR + "...")
+          - pattern: |
+              dangerouslySetInnerHTML={{ __html: $VAR }}
+
+  - id: antares-79-java
+    message: "Possible cross-site scripting via unescaped output in HttpServletResponse. Use template engine with autoescaping."
+    severity: WARNING
+    languages: [java]
+    metadata:
+      cwe: "CWE-79: Improper Neutralization of Input During Web Page Generation"
+      category: security
+      technology: jsp
+    pattern: |
+      $RESPONSE.getWriter().print("..." + $USER_INPUT + "...")

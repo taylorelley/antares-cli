@@ -62,10 +62,45 @@
         "category": "Antares"
       },
       {
+        "command": "antares.sastScan",
+        "title": "Run SAST Scan (Opengrep)",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.sastScanAndVerify",
+        "title": "Run SAST Scan + Verify with Antares",
+        "category": "Antares"
+      },
+      {
         "command": "antares.clearResults",
         "title": "Clear Results",
         "category": "Antares",
         "icon": "$(clear-all)"
+      },
+      {
+        "command": "antares.showReport",
+        "title": "Open Report (Webview)",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.showHistory",
+        "title": "Show Scan History",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.testConnection",
+        "title": "Test Connection",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.showOutput",
+        "title": "Show Output Channel",
+        "category": "Antares"
+      },
+      {
+        "command": "antares.verifyFinding",
+        "title": "Verify Finding with Antares",
+        "category": "Antares"
       }
     ],
     "viewsContainers": {
@@ -103,6 +138,16 @@
           "command": "antares.autoSweep",
           "when": "explorerResourceIsFolder",
           "group": "antares@2"
+        },
+        {
+          "command": "antares.sastScan",
+          "when": "explorerResourceIsFolder",
+          "group": "antares@3"
+        },
+        {
+          "command": "antares.sastScanAndVerify",
+          "when": "explorerResourceIsFolder",
+          "group": "antares@4"
         }
       ],
       "view/title": [
@@ -112,6 +157,64 @@
           "group": "navigation"
         }
       ]
+    },
+    "walkthroughs": {
+      "start": {
+        "title": "Get Started with Antares",
+        "description": "Configure your endpoint and run your first security scan.",
+        "steps": [
+          {
+            "id": "installed",
+            "title": "Antares is installed",
+            "description": "The Antares Security Scanner extension is active. Proceed to configure your endpoint.",
+            "media": {
+              "markdown": "media/walkthrough.md#step-1-install"
+            }
+          },
+          {
+            "id": "configureEndpoint",
+            "title": "Configure your inference endpoint",
+            "description": "Set the provider, endpoint URL, and model ID in Antares settings.",
+            "media": {
+              "markdown": "media/walkthrough.md#step-2-configure-endpoint"
+            },
+            "completionEvents": [
+              "onCommand:antares.testConnection"
+            ],
+            "when": "config.antares.model != '' && config.antares.endpoint != ''"
+          },
+          {
+            "id": "testConnection",
+            "title": "Test the connection",
+            "description": "Verify your endpoint is reachable and the model is available.",
+            "media": {
+              "markdown": "media/walkthrough.md#step-3-test-connection"
+            },
+            "button": {
+              "command": "antares.testConnection",
+              "title": "Test Connection"
+            },
+            "completionEvents": [
+              "onCommand:antares.testConnection"
+            ]
+          },
+          {
+            "id": "firstScan",
+            "title": "Run your first scan",
+            "description": "Run a SAST scan or a CWE-targeted scan to find vulnerabilities.",
+            "media": {
+              "markdown": "media/walkthrough.md#step-4-first-scan"
+            },
+            "button": {
+              "command": "antares.sastScan",
+              "title": "Run SAST Scan"
+            },
+            "completionEvents": [
+              "onView:antaresResults"
+            ]
+          }
+        ]
+      }
     },
     "configuration": {
       "title": "Antares",
@@ -178,6 +281,45 @@
           ],
           "default": "warning",
           "markdownDescription": "Severity used for findings reported in the Problems panel."
+        },
+        "antares.opengrep.binaryPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Override path to the opengrep binary. Leave empty to use the bundled binary for your platform."
+        },
+        "antares.opengrep.rulesPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Override path to opengrep rules directory. Leave empty to use bundled rules."
+        },
+        "antares.opengrep.severity": {
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARNING",
+            "INFO",
+            "ALL"
+          ],
+          "default": "ALL",
+          "markdownDescription": "Minimum severity to report from SAST scan."
+        },
+        "antares.opengrep.timeoutSeconds": {
+          "type": "number",
+          "default": 300,
+          "markdownDescription": "Timeout for opengrep scan in seconds."
+        },
+        "antares.opengrep.ignoreGlobs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "Glob patterns to exclude from SAST scan."
+        },
+        "antares.opengrep.maxVerifiedFindings": {
+          "type": "number",
+          "default": 25,
+          "markdownDescription": "Maximum number of SAST findings to verify with the Antares agent (0 disables verification). Grouped by file+CWE."
         }
       }
     }
@@ -190,7 +332,9 @@
     "check-types": "tsc --noEmit",
     "test-unit": "node --test out-test/test/*.test.js",
     "pretest-unit": "tsc -p tsconfig.test.json",
-    "vsix": "vsce package --no-dependencies"
+    "vsix": "vsce package --no-dependencies",
+    "fetch-opengrep": "node tools/fetch-opengrep.mjs",
+    "fetch-opengrep:all": "node tools/fetch-opengrep.mjs --all"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

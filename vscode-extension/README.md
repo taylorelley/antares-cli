@@ -10,6 +10,18 @@ requires **no Python, no external tools, and no runtime dependencies**. The mode
 configurable and works against **OpenAI-API-compatible** servers and **Ollama**, including
 a local Ollama instance out of the box.
 
+## SAST Scanning with Opengrep
+
+Antares now includes **static application security testing (SAST)** powered by [Opengrep](https://github.com/opengrep/opengrep),
+a fork of Semgrep. Run fast, rule-based scans for common vulnerabilities (SQL injection, XSS, path traversal, etc.)
+across 10+ CWEs, then optionally verify findings with the Antares agent to reduce false positives.
+
+**Two-step workflow:**
+1. **SAST Scan** — Opengrep scans your code with bundled rules (30 rules, 10 CWEs, Apache-2.0 licensed)
+2. **Verify Findings** — Antares agent investigates each finding to confirm or reject (reduces false positives)
+
+Opengrep binaries are bundled per-platform (Linux, macOS, Windows) — no installation required.
+
 ## How it works
 
 Everything runs inside the extension. Scans execute in a **Node worker thread** so the
@@ -19,9 +31,14 @@ and the bundled MITRE CWE catalog (969 entries) all ship with the extension.
 
 ```
 VS Code extension  ──worker thread──▶  native Antares engine
-      ▲                                       │
-      └──────────── progress / findings ──────┘
-                     (streamed events)
+       ▲                                       │
+       └──────────── progress / findings ──────┘
+                      (streamed events)
+
+SAST Scan:
+VS Code extension  ──child_process──▶  opengrep binary (bundled)
+       ▲                                       │
+       └──────────── JSON findings ────────────┘
 ```
 
 The agent talks to your model over the OpenAI SSE streaming API. Nothing else leaves your
@@ -31,10 +48,12 @@ network.
 ## Requirements
 
 - **VS Code 1.85+** (ships a recent Node runtime).
-- Access to an inference endpoint:
+- Access to an inference endpoint (for Antares agent verification):
   - **Ollama**: run `ollama serve` and pull a model (e.g. `ollama pull qwen2.5-coder`).
   - **OpenAI-compatible** server (vLLM, LM Studio, a gateway, etc.).
   - **vLLM-hosted Antares checkpoints** for the tested `/v1/completions` path.
+
+**Opengrep binaries are bundled per-platform** (Linux x64/arm64, macOS x64/arm64, Windows x64, Alpine x64) — no installation required for SAST scanning.
 
 That's it — there is no Python or CLI to install.
 
@@ -47,12 +66,25 @@ That's it — there is no Python or CLI to install.
    right-click a folder in the Explorer → **Antares: Scan Folder for CWE…**.
 4. Findings appear in the **Problems panel** and the **Antares** activity-bar view.
 
+### SAST Scan (Opengrep)
+
+1. Right-click a folder → **Antares: Run SAST Scan (Opengrep)** or run from Command Palette.
+2. Opengrep scans with bundled rules (30 rules, 10 CWEs: SQL injection, XSS, command injection, etc.).
+3. Findings appear in Problems panel with precise line/col ranges.
+4. To verify findings with Antares agent: **Antares: Run SAST Scan and Verify** — agent confirms/rejects each finding.
+5. View rich report: **Antares: Show Report** (webview with filters, triage, export).
+
 ## Commands
 
 | Command | Description |
 | --- | --- |
 | `Antares: Scan Folder for CWE…` | Prompts for CWE IDs and scans a folder for exactly those classes. |
 | `Antares: Auto-Sweep Folder for Vulnerabilities` | Profiles the repo, auto-selects likely CWE classes, and scans them in parallel. |
+| `Antares: Run SAST Scan (Opengrep)` | Fast rule-based scan for common vulnerabilities (SQL injection, XSS, etc.). |
+| `Antares: Run SAST Scan and Verify` | SAST scan + Antares agent verification to reduce false positives. |
+| `Antares: Show Report` | Opens rich webview report with filters, triage, and export. |
+| `Antares: Show History` | Quick pick to reopen past scan results. |
+| `Antares: Test Connection` | Verifies inference endpoint reachability and model availability. |
 | `Antares: Set API Key` | Stores an API key in VS Code SecretStorage (sent as a bearer token). |
 | `Antares: Clear API Key` | Removes the stored API key. |
 | `Antares: Show Last Report (JSON)` | Opens the most recent result as JSON. |
@@ -71,6 +103,12 @@ That's it — there is no Python or CLI to install.
 | `antares.sweep.workers` | `4` | Parallel CWE workers for Auto-Sweep. |
 | `antares.sweep.maxCwes` | `8` | Max CWE classes Auto-Sweep selects. |
 | `antares.diagnosticsSeverity` | `warning` | Severity used for findings in the Problems panel. |
+| `antares.opengrep.binaryPath` | `""` | Override path to opengrep binary. Leave empty to use bundled binary. |
+| `antares.opengrep.rulesPath` | `""` | Override path to opengrep rules directory. Leave empty to use bundled rules. |
+| `antares.opengrep.severity` | `ALL` | Minimum severity to report: `ERROR`, `WARNING`, `INFO`, or `ALL`. |
+| `antares.opengrep.timeoutSeconds` | `300` | Timeout for opengrep scan in seconds. |
+| `antares.opengrep.ignoreGlobs` | `[]` | Glob patterns to exclude from SAST scan. |
+| `antares.opengrep.maxVerifiedFindings` | `25` | Max findings to verify with Antares agent (grouped by file+CWE). |
 
 ### API style and providers
 
@@ -107,6 +145,7 @@ This extension is a faithful port of the Python `antares-cli` reference:
 
 ```bash
 npm install
+npm run fetch-opengrep:linux-x64  # download opengrep binary for your platform
 npm run compile        # bundle to dist/ (extension.js + worker.js) via esbuild
 npm run check-types    # tsc --noEmit
 npm run test-unit      # node --test parity + behavior tests (no external deps)
@@ -120,9 +159,18 @@ The bundled CWE data and the generated selection rule tables live under `data/`.
 the selection tables from the Python reference with
 `uv run python tools/gen-selection-tables.py` (dev-only; requires the `antares-cli` repo).
 
+Opengrep binaries are fetched from GitHub Releases and stored in `bin/<platform>/`. The
+`fetch-opengrep.mjs` script downloads the binary for your platform. CI fetches all platforms
+for release builds.
+
 ### Git hook (auto-build the VSIX) & CI
 
 A pre-commit hook rebuilds and type-checks the VSIX whenever extension source is staged;
 enable it once per clone with `git config core.hooksPath .githooks`. CI
 (`.github/workflows/vscode-extension.yml`) builds, tests, and packages on push/PR, and
 publishes a GitHub Release (with the `.vsix`) on a `vscode-v*` tag.
+
+## Third-Party Notices
+
+This extension bundles [Opengrep](https://github.com/opengrep/opengrep) (LGPL-2.1) for
+SAST scanning. See `THIRD_PARTY_NOTICES.md` for full license text and attribution.

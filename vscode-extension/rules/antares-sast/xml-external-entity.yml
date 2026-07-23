@@ -1,0 +1,57 @@
+# Copyright 2026 Antares. Licensed under Apache-2.0.
+
+rules:
+  - id: antares-611-python
+    message: "Possible XML External Entity (XXE) vulnerability. Disable external entity processing in XML parsers."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-611: Improper Restriction of XML External Entity Reference"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              etree.fromstring($XML_DATA)
+          - pattern: |
+              etree.parse($XML_SOURCE)
+          - pattern: |
+              sax.parseString($XML_DATA)
+          - pattern: |
+              minidom.parse($XML_SOURCE)
+          - pattern: |
+              minidom.parseString($XML_DATA)
+
+  - id: antares-611-java
+    message: "Possible XML External Entity (XXE) vulnerability. Disable DTD processing and external entities."
+    severity: WARNING
+    languages: [java]
+    metadata:
+      cwe: "CWE-611: Improper Restriction of XML External Entity Reference"
+      category: security
+    patterns:
+      - pattern-either:
+          - pattern: |
+              DocumentBuilderFactory.newInstance().newDocumentBuilder().parse($XML_SOURCE)
+          - pattern: |
+              SAXParserFactory.newInstance().newSAXParser().parse($XML_SOURCE, ...)
+          - pattern: |
+              XMLReaderFactory.createXMLReader().parse($XML_SOURCE)
+          - pattern: |
+              new SAXBuilder().build($XML_SOURCE)
+
+  - id: antares-611-csharp
+    message: "Possible XML External Entity (XXE) vulnerability. Disable DTD processing and external entities."
+    severity: WARNING
+    languages: [csharp]
+    metadata:
+      cwe: "CWE-611: Improper Restriction of XML External Entity Reference"
+      category: security
+      technology: dotnet
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new XmlDocument().Load($XML_SOURCE)
+          - pattern: |
+              new XmlTextReader($XML_SOURCE)
+          - pattern: |
+              XDocument.Load($XML_SOURCE)
