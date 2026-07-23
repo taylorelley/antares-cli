@@ -57,6 +57,11 @@
         "category": "Antares"
       },
       {
+        "command": "antares.saveReport",
+        "title": "Save Report…",
+        "category": "Antares"
+      },
+      {
         "command": "antares.clearResults",
         "title": "Clear Results",
         "category": "Antares",

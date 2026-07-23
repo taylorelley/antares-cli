@@ -5,6 +5,8 @@ import { DiagnosticsManager } from "./diagnostics";
 import { EngineError, runScan, ScanCancelledError } from "./engine/runner";
 import { AntaresResult, HostEvent, ScanMode } from "./findings";
 import { buildHostRequest, ConfigError, parseCweIds } from "./requestBuilder";
+import { CweDatabase } from "./antares/knowledge/cweDatabase";
+import { ReportFormat, serializeReport } from "./reports";
 import { AntaresResultsProvider } from "./resultsTree";
 import { clearApiKey, getApiKey, promptAndStoreApiKey } from "./secrets";
 
@@ -135,6 +137,44 @@ export function activate(context: vscode.ExtensionContext): void {
         content: JSON.stringify(lastReport.result, null, 2),
       });
       await vscode.window.showTextDocument(document, { preview: false });
+    }),
+    vscode.commands.registerCommand("antares.saveReport", async () => {
+      if (!lastReport) {
+        void vscode.window.showInformationMessage("Antares: no scan has run yet.");
+        return;
+      }
+      const format = await vscode.window.showQuickPick(
+        [
+          { label: "JSON", value: "json" as ReportFormat },
+          { label: "SARIF", value: "sarif" as ReportFormat },
+          { label: "Markdown", value: "markdown" as ReportFormat },
+        ],
+        { title: "Antares: report format", placeHolder: "Choose a report format" }
+      );
+      if (!format) {
+        return;
+      }
+      const extensionByFormat: Record<ReportFormat, string> = {
+        json: "json",
+        sarif: "sarif",
+        markdown: "md",
+      };
+      const target = await vscode.window.showSaveDialog({
+        saveLabel: "Save Antares Report",
+        defaultUri: vscode.Uri.file(`antares-report.${extensionByFormat[format.value]}`),
+      });
+      if (!target) {
+        return;
+      }
+      let cweDatabase: CweDatabase | undefined;
+      try {
+        cweDatabase = CweDatabase.loadDefault(dataDir);
+      } catch {
+        cweDatabase = undefined;
+      }
+      const content = serializeReport(lastReport.result, format.value, cweDatabase);
+      await vscode.workspace.fs.writeFile(target, Buffer.from(content, "utf-8"));
+      void vscode.window.showInformationMessage(`Antares report saved to ${target.fsPath}`);
     })
   );
 }
