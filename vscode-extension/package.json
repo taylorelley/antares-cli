@@ -1,8 +1,8 @@
 {
   "name": "antares-vscode",
   "displayName": "Antares Security Scanner",
-  "description": "Run the Antares CWE vulnerability-localization agent from VS Code against any OpenAI-compatible or Ollama endpoint.",
-  "version": "0.1.0",
+  "description": "Run the Antares CWE vulnerability-localization agent from VS Code against any OpenAI-compatible or Ollama endpoint. Native TypeScript — no Python required.",
+  "version": "0.2.0",
   "publisher": "antares",
   "license": "Apache-2.0",
   "repository": {
