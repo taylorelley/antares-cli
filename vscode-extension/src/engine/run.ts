@@ -1,6 +1,9 @@
-// Engine entry invoked inside the worker thread. This module grows over the port:
-// later phases replace the stub body with the real SecurityWorkflowService.
+// Engine entry invoked inside the worker thread: dispatch the request to the native
+// SecurityWorkflowService and stream progress/result events back to the extension.
 
+import { ProgressCallback } from "../antares/agent/types";
+import { QueryRequest, SecurityWorkflowService } from "../antares/core/service";
+import { findingToDict } from "../antares/output/finding";
 import { AntaresResult, HostEvent, HostRequest } from "../findings";
 
 export interface EngineContext {
@@ -15,21 +18,38 @@ export async function runEngine(
 ): Promise<AntaresResult> {
   ctx.emit({ type: "ready" });
 
-  // TODO(port): dispatch to the native SecurityWorkflowService (query | sweep).
-  // Phase 1 returns an empty, well-formed result to prove the worker round-trip.
-  const result: AntaresResult = {
-    summary: {
-      total_findings: 0,
-      tool_call_count: 0,
-      duration_seconds: 0,
-      cwe_ids_triggered: [],
-    },
-    findings: [],
-    metadata: {
-      mode: request.mode,
-      model: request.model,
-      engine: "typescript",
-    },
+  const service = new SecurityWorkflowService(ctx.dataDir);
+  const apiKey = request.api_key ?? ctx.apiKey;
+
+  if (request.mode === "sweep") {
+    // Auto-sweep (CWE selection engine) lands in a later phase.
+    throw new Error("Auto-sweep is not yet available in the native engine.");
+  }
+
+  const progressCallback: ProgressCallback = (state, finding) => {
+    ctx.emit({
+      type: "progress",
+      mode: "query",
+      context_usage_percent: state.contextUsagePercent,
+      trajectory_len: state.trajectory.length,
+    });
+    if (finding) {
+      ctx.emit({ type: "finding", finding: findingToDict(finding) as never });
+    }
   };
-  return result;
+
+  const queryRequest: QueryRequest = {
+    target: request.target,
+    cweIds: request.cwe_ids,
+    query: request.query,
+    model: request.model,
+    endpoint: request.endpoint,
+    backend: request.backend,
+    apiStyle: request.api_style,
+    apiKey,
+    terminalCallBudget: request.terminal_call_budget,
+  };
+
+  const result = await service.runQuery(queryRequest, progressCallback);
+  return result.toDict() as unknown as AntaresResult;
 }
