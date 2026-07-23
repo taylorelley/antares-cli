@@ -119,6 +119,24 @@ git config core.hooksPath .githooks
 
 The hook is a no-op for commits that do not touch `vscode-extension/` source.
 
+### Continuous integration & releases
+
+`.github/workflows/vscode-extension.yml` builds, type-checks, unit-tests, and
+packages the VSIX on every push/PR that touches `vscode-extension/`, uploading
+the `.vsix` as a build artifact.
+
+To cut a release, bump `version` in `package.json` and push a matching tag
+prefixed with `vscode-v`:
+
+```bash
+git tag vscode-v0.1.0
+git push origin vscode-v0.1.0
+```
+
+The workflow then creates a GitHub Release with the `.vsix` attached. If a
+`VSCE_PAT` repository secret is present, it also publishes to the VS Code
+Marketplace.
+
 The bundled `python/antares_host.py` speaks newline-delimited JSON: a single request
 object on stdin, then `ready` / `progress` / `worker` / `finding` / `result` / `error`
 event objects on stdout. See the file header for the full protocol.

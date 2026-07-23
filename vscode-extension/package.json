@@ -203,7 +203,7 @@
     "watch": "node esbuild.js --watch",
     "package": "node esbuild.js --production",
     "check-types": "tsc --noEmit",
-    "test-unit": "node --test ./out-test/**/*.test.js",
+    "test-unit": "node --test out-test/test/*.test.js",
     "pretest-unit": "tsc -p tsconfig.test.json",
     "vsix": "vsce package --no-dependencies"
   },
