@@ -1,0 +1,135 @@
+{
+  "cases": {
+    "tool_call_wrapped": "Let me look.\n<tool_call>\n{\"tool\": \"terminal\", \"args\": {\"command\": \"ls\"}}\n</tool_call>\n",
+    "tool_call_name_arguments": "<tool_call>{\"name\": \"read_file\", \"arguments\": {\"path\": \"app.py\"}}</tool_call>",
+    "submit_no_args": "<tool_call>{\"name\": \"submit_no_vulnerability_found\"}</tool_call>",
+    "submit_files": "<tool_call>{\"tool\":\"submit_vulnerable_files\",\"args\":{\"ranked_files\":[\"a.py\",\"b.py\"]}}</tool_call>",
+    "raw_object": "thinking {\"tool\":\"terminal\",\"args\":{\"command\":\"cat x\"}} done",
+    "done_tag": "ok<done>{}</done>",
+    "answer_tag": "<answer>The file is app.py</answer>",
+    "think_tags": "<think>\nreasoning here\n</think>\nplain text",
+    "dangling_tool_call": "<tool_call>\n{\"tool\":\"terminal\",\"args\":{\"command\":\"ls\"}}",
+    "plain_only": "just some text with no tools",
+    "hyphen_name": "<tool_call>{\"tool\":\"read-file\",\"args\":{\"path\":\"x\"}}</tool_call>",
+    "malformed_json": "<tool_call>{not valid}</tool_call>"
+  },
+  "events": {
+    "tool_call_wrapped": [
+      {
+        "t": "text",
+        "text": "Let me look.\n"
+      },
+      {
+        "t": "tool_call",
+        "name": "terminal",
+        "args": {
+          "command": "ls"
+        }
+      },
+      {
+        "t": "text",
+        "text": "\n"
+      }
+    ],
+    "tool_call_name_arguments": [
+      {
+        "t": "tool_call",
+        "name": "read_file",
+        "args": {
+          "path": "app.py"
+        }
+      }
+    ],
+    "submit_no_args": [
+      {
+        "t": "tool_call",
+        "name": "submit_no_vulnerability_found",
+        "args": {}
+      }
+    ],
+    "submit_files": [
+      {
+        "t": "tool_call",
+        "name": "submit_vulnerable_files",
+        "args": {
+          "ranked_files": [
+            "a.py",
+            "b.py"
+          ]
+        }
+      }
+    ],
+    "raw_object": [
+      {
+        "t": "text",
+        "text": "thinking "
+      },
+      {
+        "t": "tool_call",
+        "name": "terminal",
+        "args": {
+          "command": "cat x"
+        }
+      },
+      {
+        "t": "text",
+        "text": " done"
+      }
+    ],
+    "done_tag": [
+      {
+        "t": "text",
+        "text": "ok"
+      },
+      {
+        "t": "done"
+      }
+    ],
+    "answer_tag": [
+      {
+        "t": "answer",
+        "text": "The file is app.py"
+      }
+    ],
+    "think_tags": [
+      {
+        "t": "text",
+        "text": "\nreasoning here\n\nplain text"
+      }
+    ],
+    "dangling_tool_call": [
+      {
+        "t": "text",
+        "text": "<tool_call>\n"
+      },
+      {
+        "t": "tool_call",
+        "name": "terminal",
+        "args": {
+          "command": "ls"
+        }
+      }
+    ],
+    "plain_only": [
+      {
+        "t": "text",
+        "text": "just some text with no tools"
+      }
+    ],
+    "hyphen_name": [
+      {
+        "t": "tool_call",
+        "name": "read_file",
+        "args": {
+          "path": "x"
+        }
+      }
+    ],
+    "malformed_json": [
+      {
+        "t": "text",
+        "text": "parse error: invalid JSON in <tool_call>"
+      }
+    ]
+  }
+}

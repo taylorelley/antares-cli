@@ -1,0 +1,89 @@
+name: VS Code Extension
+
+on:
+  push:
+    branches: [main, master]
+    paths: ["vscode-extension/**", ".github/workflows/vscode-extension.yml"]
+    tags: ["vscode-v*"]
+  pull_request:
+    paths: ["vscode-extension/**", ".github/workflows/vscode-extension.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & package VSIX
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: vscode-extension
+    outputs:
+      version: ${{ steps.package.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: ${{ github.event_name != 'pull_request' && 'npm' || '' }}
+          cache-dependency-path: vscode-extension/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run check-types
+
+      - name: Unit tests
+        run: |
+          npm run pretest-unit
+          npm run test-unit
+
+      - name: Package VSIX
+        id: package
+        run: |
+          npm run vsix
+          version="$(node -p "require('./package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: antares-vscode-${{ steps.package.outputs.version }}
+          path: vscode-extension/*.vsix
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/vscode-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      # Mapped here so the publish step's `if` can test it — the `secrets` context
+      # is not allowed in `if` conditionals (using it fails the workflow at startup).
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+    steps:
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: antares-vscode-${{ needs.build.outputs.version }}
+          path: dist-vsix
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Antares VS Code Extension ${{ github.ref_name }}
+          files: dist-vsix/*.vsix
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
+      # Optional: publish to the VS Code Marketplace when a VSCE_PAT secret is set.
+      - name: Publish to Marketplace
+        if: ${{ env.VSCE_PAT != '' }}
+        working-directory: dist-vsix
+        run: npx --yes @vscode/vsce publish --packagePath *.vsix

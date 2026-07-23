@@ -1,0 +1,35 @@
+#!/bin/sh
+# Antares pre-commit hook.
+#
+# When a commit touches the VS Code extension source, rebuild the VSIX (and
+# type-check it first) so a broken extension build can never be committed. The
+# hook is a no-op for commits that do not touch the extension.
+#
+# Enable it with:  git config core.hooksPath .githooks
+
+set -e
+
+# Only run when extension source (not the built artifact) is staged.
+changed=$(git diff --cached --name-only --diff-filter=ACMR)
+if ! printf '%s\n' "$changed" | grep -qE '^vscode-extension/(src/|data/|media/|package\.json|package-lock\.json|esbuild\.js|tsconfig.*\.json|\.vscodeignore)'; then
+  exit 0
+fi
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "pre-commit: npm not found; skipping the Antares VSIX build." >&2
+  exit 0
+fi
+
+echo "pre-commit: extension source changed — building the Antares VSIX…"
+cd vscode-extension
+
+# Install dev dependencies on first run so the build tools are available.
+if [ ! -d node_modules ]; then
+  echo "pre-commit: installing extension dev dependencies…"
+  npm install --no-audit --no-fund
+fi
+
+npm run check-types
+npm run vsix
+
+echo "pre-commit: VSIX built successfully."

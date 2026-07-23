@@ -100,7 +100,7 @@ class RemoteInferenceBackend(InferenceBackend):
         repetition_penalty: float | None = None,
         frequency_penalty: float | None = DEFAULT_ANTARES_FREQUENCY_PENALTY,
         stop_tokens: list[str] | None = None,
-        use_completions_api: bool = DEFAULT_ANTARES_USE_COMPLETIONS_API,
+        use_completions_api: bool | None = None,
         client: httpx.Client | None = None,
     ) -> None:
         super().__init__(model_id=model_id, context_window=context_window)
@@ -150,9 +150,12 @@ class RemoteInferenceBackend(InferenceBackend):
         self.repetition_penalty = repetition_penalty
         self.frequency_penalty = frequency_penalty
         self.stop_tokens = list(DEFAULT_ANTARES_STOP_TOKENS) if stop_tokens is None else stop_tokens
-        self.use_completions_api = use_completions_api or (
-            endpoint.rstrip("/").endswith("/v1/completions") and "/chat/completions" not in endpoint
-        )
+        if use_completions_api is not None:
+            self.use_completions_api = use_completions_api
+        else:
+            self.use_completions_api = DEFAULT_ANTARES_USE_COMPLETIONS_API or (
+                endpoint.rstrip("/").endswith("/v1/completions") and "/chat/completions" not in endpoint
+            )
         self._request_headers = _build_request_headers(api_key)
         self._owns_client = client is None
         self._client = client or httpx.Client(
