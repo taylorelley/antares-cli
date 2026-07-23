@@ -11,7 +11,7 @@ set -e
 
 # Only run when extension source (not the built artifact) is staged.
 changed=$(git diff --cached --name-only --diff-filter=ACMR)
-if ! printf '%s\n' "$changed" | grep -qE '^vscode-extension/(src/|python/|media/|package\.json|package-lock\.json|esbuild\.js|tsconfig.*\.json|\.vscodeignore)'; then
+if ! printf '%s\n' "$changed" | grep -qE '^vscode-extension/(src/|data/|media/|package\.json|package-lock\.json|esbuild\.js|tsconfig.*\.json|\.vscodeignore)'; then
   exit 0
 fi
 

@@ -52,11 +52,6 @@
         "category": "Antares"
       },
       {
-        "command": "antares.setupEnvironment",
-        "title": "Set Up Python Environment",
-        "category": "Antares"
-      },
-      {
         "command": "antares.showLastReport",
         "title": "Show Last Report (JSON)",
         "category": "Antares"
@@ -152,21 +147,6 @@
           ],
           "default": "auto",
           "markdownDescription": "Which OpenAI-compatible API to call. `auto` derives it from the provider (chat for Ollama/OpenAI-compatible, completions for vLLM). `chat` targets `/v1/chat/completions`; `completions` targets `/v1/completions`."
-        },
-        "antares.pythonPath": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "Path to a Python 3.11+ interpreter. Leave empty to auto-detect. If the interpreter already has `antares-cli` installed it is used directly; otherwise a managed virtual environment is created."
-        },
-        "antares.autoInstall": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Automatically create a managed virtual environment and install `antares-cli` when it is not already available."
-        },
-        "antares.packageSpec": {
-          "type": "string",
-          "default": "antares-cli",
-          "markdownDescription": "pip requirement used to install Antares into the managed environment. Can be a version (`antares-cli==1.2.3`), a local path, or a wheel file."
         },
         "antares.toolBudget": {
           "type": "number",

@@ -7,7 +7,8 @@ const watch = process.argv.includes("--watch");
 
 async function main() {
   const context = await esbuild.context({
-    entryPoints: ["src/extension.ts"],
+    // Two entry points: the extension host bundle and the worker-thread engine.
+    entryPoints: { extension: "src/extension.ts", worker: "src/engine/worker.ts" },
     bundle: true,
     format: "cjs",
     minify: production,
@@ -15,7 +16,7 @@ async function main() {
     sourcesContent: false,
     platform: "node",
     target: "node18",
-    outfile: "dist/extension.js",
+    outdir: "dist",
     // The `vscode` module is provided by the extension host at runtime.
     external: ["vscode"],
     logLevel: "info",

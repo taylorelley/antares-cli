@@ -1,10 +1,9 @@
 import * as vscode from "vscode";
 
-import { readConfig, readDiagnosticsSeverity, readEnvironmentConfig } from "./config";
+import { readConfig, readDiagnosticsSeverity } from "./config";
 import { DiagnosticsManager } from "./diagnostics";
+import { EngineError, runScan, ScanCancelledError } from "./engine/runner";
 import { AntaresResult, HostEvent, ScanMode } from "./findings";
-import { HostRunError, runScan, ScanCancelledError } from "./hostRunner";
-import { PythonEnvError, resolveInterpreter } from "./pythonEnv";
 import { buildHostRequest, ConfigError, parseCweIds } from "./requestBuilder";
 import { AntaresResultsProvider } from "./resultsTree";
 import { clearApiKey, getApiKey, promptAndStoreApiKey } from "./secrets";
@@ -25,11 +24,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   let lastReport: LastReport | undefined;
 
-  const hostScript = vscode.Uri.joinPath(
-    context.extensionUri,
-    "python",
-    "antares_host.py"
-  ).fsPath;
+  const dataDir = vscode.Uri.joinPath(context.extensionUri, "data").fsPath;
 
   async function runScanCommand(mode: ScanMode, resource?: vscode.Uri): Promise<void> {
     const target = await resolveTargetFolder(resource);
@@ -70,7 +65,6 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     const apiKey = await getApiKey(context);
-    const envConfig = readEnvironmentConfig();
 
     await vscode.window.withProgress(
       {
@@ -80,25 +74,15 @@ export function activate(context: vscode.ExtensionContext): void {
       },
       async (progress, token) => {
         try {
-          progress.report({ message: "Preparing Python environment…" });
-          const resolved = await resolveInterpreter(context, envConfig, {
-            report: (message) => progress.report({ message }),
-          });
-          output.appendLine(
-            `[env] interpreter=${resolved.interpreter} managed=${resolved.managed}`
-          );
-
           let findingCount = 0;
           progress.report({
             message: mode === "sweep" ? "Selecting CWE classes…" : "Investigating…",
           });
 
           const result = await runScan({
-            interpreter: resolved.interpreter,
-            hostScript,
             request,
+            dataDir,
             apiKey,
-            cwd: target.fsPath,
             token,
             log: (line) => output.appendLine(line),
             onEvent: (event) => {
@@ -151,27 +135,6 @@ export function activate(context: vscode.ExtensionContext): void {
         content: JSON.stringify(lastReport.result, null, 2),
       });
       await vscode.window.showTextDocument(document, { preview: false });
-    }),
-    vscode.commands.registerCommand("antares.setupEnvironment", async () => {
-      const envConfig = readEnvironmentConfig();
-      await vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: "Antares: setting up Python environment",
-        },
-        async (progress) => {
-          try {
-            const resolved = await resolveInterpreter(context, envConfig, {
-              report: (message) => progress.report({ message }),
-            });
-            void vscode.window.showInformationMessage(
-              `Antares is ready (interpreter: ${resolved.interpreter}).`
-            );
-          } catch (error) {
-            handleScanError(error, output);
-          }
-        }
-      );
     })
   );
 }
@@ -246,15 +209,12 @@ function handleScanError(error: unknown, output: vscode.OutputChannel): void {
   }
   const message = error instanceof Error ? error.message : String(error);
   output.appendLine(`[error] ${message}`);
-  if (error instanceof HostRunError && error.detail) {
+  if (error instanceof EngineError && error.detail) {
     output.appendLine(error.detail);
   }
-  const actions = error instanceof PythonEnvError ? ["Open Settings", "Show Log"] : ["Show Log"];
-  void vscode.window.showErrorMessage(`Antares: ${message}`, ...actions).then((selection) => {
+  void vscode.window.showErrorMessage(`Antares: ${message}`, "Show Log").then((selection) => {
     if (selection === "Show Log") {
       output.show();
-    } else if (selection === "Open Settings") {
-      void vscode.commands.executeCommand("workbench.action.openSettings", "antares");
     }
   });
 }

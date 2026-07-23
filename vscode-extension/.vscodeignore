@@ -10,6 +10,6 @@ node_modules/**
 **/*.map
 **/*.ts
 !dist/**
-!python/**
+!data/**
 !media/**
 dist/**/*.map

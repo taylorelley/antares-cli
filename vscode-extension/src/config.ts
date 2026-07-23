@@ -2,12 +2,6 @@ import * as vscode from "vscode";
 
 import { AntaresConfig, ApiStyleSetting, Provider } from "./requestBuilder";
 
-export interface EnvironmentConfig {
-  pythonPath: string;
-  autoInstall: boolean;
-  packageSpec: string;
-}
-
 export type DiagnosticsSeverity = "error" | "warning" | "information" | "hint";
 
 export function readConfig(scope?: vscode.ConfigurationScope): AntaresConfig {
@@ -20,15 +14,6 @@ export function readConfig(scope?: vscode.ConfigurationScope): AntaresConfig {
     toolBudget: config.get<number>("toolBudget", 0),
     sweepWorkers: config.get<number>("sweep.workers", 4),
     sweepMaxCwes: config.get<number>("sweep.maxCwes", 8),
-  };
-}
-
-export function readEnvironmentConfig(): EnvironmentConfig {
-  const config = vscode.workspace.getConfiguration("antares");
-  return {
-    pythonPath: config.get<string>("pythonPath", "").trim(),
-    autoInstall: config.get<boolean>("autoInstall", true),
-    packageSpec: config.get<string>("packageSpec", "antares-cli").trim() || "antares-cli",
   };
 }
 
