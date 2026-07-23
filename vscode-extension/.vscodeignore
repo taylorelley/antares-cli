@@ -12,3 +12,4 @@ node_modules/**
 !dist/**
 !python/**
 !media/**
+dist/**/*.map

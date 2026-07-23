@@ -4,7 +4,12 @@
   "description": "Run the Antares CWE vulnerability-localization agent from VS Code against any OpenAI-compatible or Ollama endpoint.",
   "version": "0.1.0",
   "publisher": "antares",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taylorelley/antares-cli.git",
+    "directory": "vscode-extension"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -199,11 +204,13 @@
     "package": "node esbuild.js --production",
     "check-types": "tsc --noEmit",
     "test-unit": "node --test ./out-test/**/*.test.js",
-    "pretest-unit": "tsc -p tsconfig.test.json"
+    "pretest-unit": "tsc -p tsconfig.test.json",
+    "vsix": "vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.21.5",
     "typescript": "^5.4.5"
   }
