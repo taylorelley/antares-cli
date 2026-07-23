@@ -150,9 +150,11 @@ export class RemoteInferenceBackend implements InferenceBackend {
 
     this.endpoint = normalizedEndpoint;
     this.useCompletionsApi =
-      (options.useCompletionsApi ?? DEFAULT_ANTARES_USE_COMPLETIONS_API) ||
-      (normalizedEndpoint.endsWith("/v1/completions") &&
-        !normalizedEndpoint.includes("/chat/completions"));
+      options.useCompletionsApi !== undefined
+        ? options.useCompletionsApi
+        : (DEFAULT_ANTARES_USE_COMPLETIONS_API ||
+          (normalizedEndpoint.endsWith("/v1/completions") &&
+            !normalizedEndpoint.includes("/chat/completions")));
 
     this.headers = { "Content-Type": "application/json" };
     if (options.apiKey) {

@@ -14,6 +14,7 @@ export interface ToolExecutionResult {
   success: boolean;
   output: Record<string, unknown>;
   errorMessage: string | null;
+  maxChars?: number;
 }
 
 export class ToolRouter {
@@ -29,10 +30,10 @@ export class ToolRouter {
     const normalized = toolName.trim().toLowerCase().replace(/ /g, "");
     try {
       if (normalized === "terminal" || normalized === "bash") {
-        return { success: true, output: this.terminal(args), errorMessage: null };
+        return { success: true, output: this.terminal(args), errorMessage: null, maxChars: MAX_TOOL_OUTPUT_CHARS };
       }
       if (normalized === "read_file" || normalized === "readfile") {
-        return { success: true, output: this.readFile(args), errorMessage: null };
+        return { success: true, output: this.readFile(args), errorMessage: null, maxChars: MAX_READ_FILE_CHARS };
       }
       return {
         success: false,

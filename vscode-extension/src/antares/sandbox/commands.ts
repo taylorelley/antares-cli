@@ -38,16 +38,25 @@ function readFileConfined(cwd: string, rel: string): { content?: string; error?:
   if (!resolved) {
     return { error: `${rel}: Permission denied` };
   }
+  let real: string;
+  try {
+    real = fs.realpathSync(resolved);
+  } catch {
+    return { error: `${rel}: No such file or directory` };
+  }
+  if (real !== resolved && !real.startsWith(cwd + path.sep) && real !== cwd) {
+    return { error: `${rel}: Permission denied` };
+  }
   let stat: fs.Stats;
   try {
-    stat = fs.statSync(resolved);
+    stat = fs.statSync(real);
   } catch {
     return { error: `${rel}: No such file or directory` };
   }
   if (stat.isDirectory()) {
     return { error: `${rel}: Is a directory` };
   }
-  return { content: fs.readFileSync(resolved, "utf-8") };
+  return { content: fs.readFileSync(real, "utf-8") };
 }
 
 // Split argv into options and positional operands (first "--" ends options).

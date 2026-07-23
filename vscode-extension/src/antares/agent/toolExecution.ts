@@ -6,7 +6,7 @@ import { validateToolCallSafety } from "./quarantine";
 import { ModelSessionState } from "./state";
 import { ToolRouter } from "./toolRouter";
 
-const REPOSITORY_COMMAND_TOOLS = new Set(["bash", "terminal", "read_file"]);
+const REPOSITORY_COMMAND_TOOLS = new Set(["bash", "terminal", "read_file", "readfile"]);
 const MAX_TOOL_ERROR_CHARS = 2_000;
 const TOOL_ERROR_TRUNCATION_SUFFIX = "...[tool error truncated]";
 const AVAILABLE_TOOLS = "terminal, read_file, submit_vulnerable_files, submit_no_vulnerability_found";
@@ -22,7 +22,7 @@ export class AgentToolExecutor {
     state.toolCallCount += 1;
     state.sessionTrace.recordToolCall({ toolName, arguments: args });
 
-    const normalized = toolName.trim().toLowerCase();
+    const normalized = toolName.trim().toLowerCase().replace(/ /g, "");
     if (REPOSITORY_COMMAND_TOOLS.has(normalized)) {
       const budget = state.terminalCallBudget;
       if (budget !== null && state.terminalCallsUsed >= budget) {
@@ -47,7 +47,7 @@ export class AgentToolExecutor {
       response = this.recordToolError(toolName, result.errorMessage ?? "unknown error", state);
     } else {
       state.consecutiveErrors = 0;
-      response = formatToolOutput(result.output);
+      response = formatToolOutput(result.output, result.maxChars);
     }
 
     const sanitized = state.contentQuarantine.sanitize(response);
@@ -73,7 +73,7 @@ function argsPreview(args: Record<string, unknown>): string {
     .join(", ");
 }
 
-function formatToolOutput(output: Record<string, unknown>): string {
+function formatToolOutput(output: Record<string, unknown>, effectiveMaxChars?: number): string {
   if ("stdout" in output) {
     let text = String(output.stdout ?? "");
     const stderr = output.stderr ? String(output.stderr) : "";
@@ -81,8 +81,9 @@ function formatToolOutput(output: Record<string, unknown>): string {
       text += `\n[stderr]: ${stderr}`;
     }
     if (output.truncated) {
+      const limit = effectiveMaxChars ?? MAX_TOOL_OUTPUT_CHARS;
       text +=
-        `\n\n[OUTPUT TRUNCATED: showing first ${MAX_TOOL_OUTPUT_CHARS.toLocaleString("en-US")} ` +
+        `\n\n[OUTPUT TRUNCATED: showing first ${limit.toLocaleString("en-US")} ` +
         "characters. Use head/tail/sed with line ranges to read specific sections.]";
     }
     return text;

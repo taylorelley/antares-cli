@@ -4,7 +4,15 @@ import * as vscode from "vscode";
 import { AntaresFinding } from "./findings";
 
 export function resolveFindingPath(targetDir: string, filePath: string): string {
-  return path.isAbsolute(filePath) ? filePath : path.join(targetDir, filePath);
+  const joined = path.isAbsolute(filePath)
+    ? filePath
+    : path.join(targetDir, filePath);
+  const normalized = path.normalize(joined);
+  const relative = path.relative(targetDir, normalized);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    return path.join(targetDir, path.basename(filePath));
+  }
+  return normalized;
 }
 
 // Publishes Antares findings as file-level diagnostics in the Problems panel.

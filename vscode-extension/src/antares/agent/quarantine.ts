@@ -5,7 +5,7 @@
 // enforced by the sandbox policy layer, so this never blocks on its own).
 
 const INJECTED_TAG_PATTERNS: [RegExp, string][] = [
-  [/<tool_call>[\s\S]*?<\/tool_call>/g, "[QUARANTINED: injected_tool_call_tag]"],
+  [/<tool_call\b[^>]*>(?!.*<\/tool_call>)/g, "[QUARANTINED: injected_tool_call_tag]"],
   [/<done>[\s\S]*?<\/done>/g, "[QUARANTINED: injected_done_tag]"],
   [/<answer>[\s\S]*?<\/answer>/g, "[QUARANTINED: injected_answer_tag]"],
   [/<finding>[\s\S]*?<\/finding>/g, "[QUARANTINED: injected_finding_tag]"],

@@ -28,31 +28,34 @@ test("auto-sweep fans out to per-CWE workers and merges findings", async () => {
   const address = server.address();
   const port = typeof address === "object" && address ? address.port : 0;
 
-  const service = new SecurityWorkflowService(DATA_DIR);
-  const events: string[] = [];
-  const result = await service.runCweSweep(
-    {
-      target: FLASK,
-      model: "mock",
-      endpoint: `http://127.0.0.1:${port}/v1`,
-      apiStyle: "chat",
-      scope: "auto",
-      maxCwes: 5,
-      workers: 4,
-      terminalCallBudget: 3,
-    },
-    (event) => events.push(event.event)
-  );
-  server.close();
+  try {
+    const service = new SecurityWorkflowService(DATA_DIR);
+    const events: string[] = [];
+    const result = await service.runCweSweep(
+      {
+        target: FLASK,
+        model: "mock",
+        endpoint: `http://127.0.0.1:${port}/v1`,
+        apiStyle: "chat",
+        scope: "auto",
+        maxCwes: 5,
+        workers: 4,
+        terminalCallBudget: 3,
+      },
+      (event) => events.push(event.event)
+    );
 
-  const dict = result.toDict() as {
-    findings: { file_path: string; cwe_ids: string[] }[];
-    summary: { total_workers: number };
-  };
-  // Exactly one finding (app.py, CWE-79) survives across the workers.
-  assert.equal(dict.findings.length, 1);
-  assert.equal(dict.findings[0].file_path, "app.py");
-  assert.deepEqual(dict.findings[0].cwe_ids, ["CWE-79"]);
-  assert.equal(dict.summary.total_workers, 5);
-  assert.ok(events.includes("started") && events.includes("completed"));
+    const dict = result.toDict() as {
+      findings: { file_path: string; cwe_ids: string[] }[];
+      summary: { total_workers: number };
+    };
+    // Exactly one finding (app.py, CWE-79) survives across the workers.
+    assert.equal(dict.findings.length, 1);
+    assert.equal(dict.findings[0].file_path, "app.py");
+    assert.deepEqual(dict.findings[0].cwe_ids, ["CWE-79"]);
+    assert.equal(dict.summary.total_workers, 5);
+    assert.ok(events.includes("started") && events.includes("completed"));
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });

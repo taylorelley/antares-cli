@@ -11,6 +11,7 @@ import {
   SUBMIT_FILE_PATH_FIELD_ALIASES,
   SUBMIT_NO_VULNERABILITY_FOUND_TOOL,
   SUBMIT_VULNERABLE_FILES_TOOL,
+  normalizeToolName,
 } from "./contracts";
 import { ModelSessionState } from "./state";
 import { ParsedToolCall } from "./streamingParser";
@@ -42,12 +43,12 @@ export class SubmissionHandler {
     state: ModelSessionState,
     progressCallback?: ProgressCallback
   ): Finding[] {
-    const submitToolName = parsedCall.toolName.trim().toLowerCase();
-    state.doneSignaled = true;
+    const submitToolName = normalizeToolName(parsedCall.toolName);
     state.toolCallCount += 1;
     state.sessionTrace.recordToolCall({ toolName: parsedCall.toolName, arguments: parsedCall.arguments });
 
     if (submitToolName === SUBMIT_NO_VULNERABILITY_FOUND_TOOL) {
+      state.doneSignaled = true;
       state.resultSubmitted = true;
       state.submissionError = null;
       state.reasoningLog.push("Submit tool: model reported no vulnerable files.");
@@ -64,6 +65,7 @@ export class SubmissionHandler {
       progressCallback
     );
     if (newFindings.length > 0) {
+      state.doneSignaled = true;
       state.resultSubmitted = true;
       state.submissionError = null;
     } else {

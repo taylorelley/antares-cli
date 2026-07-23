@@ -76,11 +76,11 @@ export class CweSelectionService {
   }
 
   select(request: CweSelectionRequest): CweSelectionPlan {
-    const profiler = new RepositoryProfiler(this.tables);
-    const profile = profiler.profile(request.target, request.ignorePaths, request.allowSensitiveFiles);
     if (request.cweIds.length > 0) {
       return this.explicitPlan(request);
     }
+    const profiler = new RepositoryProfiler(this.tables);
+    const profile = profiler.profile(request.target, request.ignorePaths, request.allowSensitiveFiles);
     return this.autoPlan(request, profile);
   }
 

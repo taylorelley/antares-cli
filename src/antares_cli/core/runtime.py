@@ -263,10 +263,12 @@ def _build_remote_backend(
     generation = backend_settings.generation
     if settings.endpoint is None:
         raise RuntimeConfigurationError("Remote inference requires a configured endpoint")
-    use_completions_api = _resolve_use_completions_api(
-        api_style,
-        default=generation.use_completions_api,
-    )
+    resolved_use_completions_api: bool | None = None
+    if api_style is not None:
+        resolved_use_completions_api = _resolve_use_completions_api(
+            api_style,
+            default=generation.use_completions_api,
+        )
     return RemoteInferenceBackend(
         model_id=settings.model,
         endpoint=settings.endpoint,
@@ -283,7 +285,7 @@ def _build_remote_backend(
         repetition_penalty=generation.repetition_penalty,
         frequency_penalty=generation.frequency_penalty,
         stop_tokens=generation.stop_tokens,
-        use_completions_api=use_completions_api,
+        use_completions_api=resolved_use_completions_api,
     )
 
 

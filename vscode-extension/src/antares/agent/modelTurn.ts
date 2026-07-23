@@ -148,7 +148,7 @@ export class ModelTurnRunner {
           answerText = this.adapter.cleanModelText(event.text);
           doneSignaled = true;
         } else {
-          parseError = event.text.startsWith("parse error:");
+          parseError = parseError || event.text.startsWith("parse error:");
           const stripped = event.text.trim();
           if (stripped) {
             state.reasoningLog.push(stripped);

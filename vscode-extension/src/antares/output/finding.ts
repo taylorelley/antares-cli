@@ -112,12 +112,15 @@ function posixNormpath(p: string): string {
 export function deduplicateFindings(findings: Finding[]): Finding[] {
   const keptByKey = new Map<string, Finding>();
   for (const finding of findings) {
-    finding.file_path = normalizeFindingPath(finding.file_path);
-    finding.cwe_ids = [...new Set(finding.cwe_ids.map((c) => normalizeCweId(c, false)))];
-    const key = JSON.stringify([finding.file_path, [...finding.cwe_ids].sort()]);
+    const normalized: Finding = {
+      ...finding,
+      file_path: normalizeFindingPath(finding.file_path),
+      cwe_ids: [...new Set(finding.cwe_ids.map((c) => normalizeCweId(c, false)))],
+    };
+    const key = JSON.stringify([normalized.file_path, [...normalized.cwe_ids].sort()]);
     const existing = keptByKey.get(key);
-    if (existing === undefined || finding.confidence > existing.confidence) {
-      keptByKey.set(key, finding);
+    if (existing === undefined || normalized.confidence > existing.confidence) {
+      keptByKey.set(key, normalized);
     }
   }
   const kept = [...keptByKey.values()];

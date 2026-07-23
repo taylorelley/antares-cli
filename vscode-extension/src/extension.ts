@@ -25,87 +25,98 @@ export function activate(context: vscode.ExtensionContext): void {
   });
 
   let lastReport: LastReport | undefined;
+  let scanInProgress = false;
 
   const dataDir = vscode.Uri.joinPath(context.extensionUri, "data").fsPath;
 
   async function runScanCommand(mode: ScanMode, resource?: vscode.Uri): Promise<void> {
-    const target = await resolveTargetFolder(resource);
-    if (!target) {
+    if (scanInProgress) {
+      void vscode.window.showInformationMessage("Antares: a scan is already in progress.");
       return;
     }
-
-    let cweIds: string[] | undefined;
-    if (mode === "query") {
-      const input = await vscode.window.showInputBox({
-        title: "Antares: Scan for CWE",
-        prompt: "Comma-separated CWE IDs to scan for (e.g. CWE-89, CWE-79, CWE-22).",
-        placeHolder: "CWE-89, CWE-79",
-        ignoreFocusOut: true,
-      });
-      if (input === undefined) {
-        return;
-      }
-      cweIds = parseCweIds(input);
-      if (cweIds.length === 0) {
-        void vscode.window.showErrorMessage(
-          "Antares: no valid CWE IDs were provided."
-        );
-        return;
-      }
-    }
-
-    const config = readConfig(target);
-    let request;
+    scanInProgress = true;
     try {
-      request = buildHostRequest(config, { mode, target: target.fsPath, cweIds });
-    } catch (error) {
-      if (error instanceof ConfigError) {
-        void offerSettings(error.message);
+      const target = await resolveTargetFolder(resource);
+      if (!target) {
         return;
       }
-      throw error;
-    }
 
-    const apiKey = await getApiKey(context);
-
-    await vscode.window.withProgress(
-      {
-        location: vscode.ProgressLocation.Notification,
-        cancellable: true,
-        title: mode === "sweep" ? "Antares auto-sweep" : "Antares scan",
-      },
-      async (progress, token) => {
-        try {
-          let findingCount = 0;
-          progress.report({
-            message: mode === "sweep" ? "Selecting CWE classes…" : "Investigating…",
-          });
-
-          const result = await runScan({
-            request,
-            dataDir,
-            apiKey,
-            token,
-            log: (line) => output.appendLine(line),
-            onEvent: (event) => {
-              findingCount = handleEvent(event, progress, findingCount);
-            },
-          });
-
-          diagnostics.setFindings(
-            target.fsPath,
-            result.findings,
-            readDiagnosticsSeverity()
+      let cweIds: string[] | undefined;
+      if (mode === "query") {
+        const input = await vscode.window.showInputBox({
+          title: "Antares: Scan for CWE",
+          prompt: "Comma-separated CWE IDs to scan for (e.g. CWE-89, CWE-79, CWE-22).",
+          placeHolder: "CWE-89, CWE-79",
+          ignoreFocusOut: true,
+        });
+        if (input === undefined) {
+          return;
+        }
+        cweIds = parseCweIds(input);
+        if (cweIds.length === 0) {
+          void vscode.window.showErrorMessage(
+            "Antares: no valid CWE IDs were provided."
           );
-          resultsProvider.update(result, target.fsPath, mode);
-          lastReport = { result, target: target.fsPath, mode };
-          treeView.title = `Findings (${result.summary.total_findings})`;
-          reportSummary(result);
-        } catch (error) {
-          handleScanError(error, output);
+          return;
         }
       }
-    );
+
+      const config = readConfig(target);
+      let request;
+      try {
+        request = buildHostRequest(config, { mode, target: target.fsPath, cweIds });
+      } catch (error) {
+        if (error instanceof ConfigError) {
+          void offerSettings(error.message);
+          return;
+        }
+        handleScanError(error, output);
+        return;
+      }
+
+      const apiKey = await getApiKey(context);
+
+      await vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          cancellable: true,
+          title: mode === "sweep" ? "Antares auto-sweep" : "Antares scan",
+        },
+        async (progress, token) => {
+          try {
+            let findingCount = 0;
+            progress.report({
+              message: mode === "sweep" ? "Selecting CWE classes…" : "Investigating…",
+            });
+
+            const result = await runScan({
+              request,
+              dataDir,
+              apiKey,
+              token,
+              log: (line) => output.appendLine(line),
+              onEvent: (event) => {
+                findingCount = handleEvent(event, progress, findingCount);
+              },
+            });
+
+            diagnostics.setFindings(
+              target.fsPath,
+              result.findings,
+              readDiagnosticsSeverity()
+            );
+            resultsProvider.update(result, target.fsPath, mode);
+            lastReport = { result, target: target.fsPath, mode };
+            treeView.title = `Findings (${result.summary.total_findings})`;
+            reportSummary(result);
+          } catch (error) {
+            handleScanError(error, output);
+          }
+        }
+      );
+    } finally {
+      scanInProgress = false;
+    }
   }
 
   context.subscriptions.push(
